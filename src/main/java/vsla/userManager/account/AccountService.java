@@ -1,0 +1,13 @@
+package vsla.userManager.account;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import vsla.userManager.account.dto.ChangePassword;
+import vsla.utils.ApiResponse;
+
+@Service
+public interface AccountService {
+
+    ResponseEntity<ApiResponse> changePassword(ChangePassword changePassword);
+
+}
