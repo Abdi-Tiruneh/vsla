@@ -45,6 +45,7 @@ public class JwtTokenUtil {
                 .withExpiresAt(new Date(System.currentTimeMillis() + ACCESS_TOKEN_EXPIRATION_TIME))
                 .withClaim("role", role)
                 .withClaim("has-group", hasGroup)
+                .withClaim("groupId", user.getGroup().getGroupId())
                 .withIssuer("Vsla App")
                 .sign(Algorithm.HMAC256(SECRET_KEY.getBytes()));
     }
