@@ -29,5 +29,5 @@ public class UserRegistrationReq {
     private String roleName;
 
     @NotNull(message = "Company is required")
-    private Short companyId;
+    private Long companyId;
 }
