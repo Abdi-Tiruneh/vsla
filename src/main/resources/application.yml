@@ -18,7 +18,7 @@ spring:
       ddl-auto: update  # Set the strategy for Hibernate to create/update the database schema. Hibernate ddl auto (create, create-drop, validate, update)
     show-sql: true
 
-# Set the port number for the web server
+
 server:
   port: 8111
 

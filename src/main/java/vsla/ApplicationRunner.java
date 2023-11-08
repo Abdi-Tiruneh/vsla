@@ -64,8 +64,9 @@ public class ApplicationRunner {
 
     private Users createUser(Role role, Company company) {
         return Users.builder()
-                .password(passwordEncoder.encode("1234"))
+                .password(passwordEncoder.encode("123456"))
                 .fullName("John Doe")
+                .gender("MALE")
                 .username("0912345678")
                 .role(role)
                 .company(company)

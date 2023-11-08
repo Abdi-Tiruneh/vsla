@@ -1,12 +1,14 @@
 package vsla.userManager.user;
 
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vsla.exceptions.customExceptions.ResourceAlreadyExistsException;
-import vsla.userManager.address.Address;
 import vsla.userManager.address.AddressService;
 import vsla.userManager.company.Company;
 import vsla.userManager.company.CompanyService;
@@ -18,11 +20,11 @@ import vsla.userManager.user.dto.UserResponse;
 import vsla.userManager.user.dto.UserUpdateReq;
 import vsla.utils.CurrentlyLoggedInUser;
 
-import java.util.Comparator;
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
+@AllArgsConstructor
+@CacheConfig(cacheNames = "user")
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
@@ -34,6 +36,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
+    @CacheEvict(allEntries = true)
     public UserResponse register(UserRegistrationReq userReq) {
         if (userRepository.findByUsername(userReq.getPhoneNumber()).isPresent())
             throw new ResourceAlreadyExistsException("Phone number is already taken");
@@ -43,18 +46,17 @@ public class UserServiceImpl implements UserService {
         return UserMapper.toUserResponse(user);
     }
 
+    //    @Cacheable(key = "#productId")
     private Users createUser(UserRegistrationReq userReq) {
-        Role role = roleService.getRoleById(userReq.getRoleId());
+        Role role = roleService.getRoleByRoleName(userReq.getRoleName());
         Company company = companyService.getCompanyById(userReq.getCompanyId());
-        Address address = addressService.addAddress(userReq.getAddress());
 
         return Users.builder()
                 .username(userReq.getPhoneNumber())
                 .password(passwordEncoder.encode(userReq.getPassword()))
                 .fullName(userReq.getFullName())
-                .proxyEnabled(userReq.isProxyEnabled())
+                .gender(userReq.getGender())
                 .role(role)
-                .address(address)
                 .company(company)
                 .userStatus(UserStatus.ACTIVE)
                 .build();
@@ -62,6 +64,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
+    @CacheEvict(allEntries = true)
     public UserResponse editUser(UserUpdateReq updateReq) {
         Users user = currentlyLoggedInUser.getUser();
 
@@ -89,6 +92,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Cacheable
     public List<UserResponse> getAllUsers() {
         List<Users> users = userRepository.findAll(Sort.by(Sort.Order.asc("userId")));
         return users.stream().
@@ -97,13 +101,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserResponse> getUsersByGroup(Long groupId) {
-        List<Users> users = userRepository.findByGroupGroupId(groupId);
-
-        return users.stream()
-                .map(UserMapper::toUserResponse)
-                .sorted(Comparator.comparing(UserResponse::getFullName).reversed())
-                .toList();
+    public List<Users> getUsersByGroup(Long groupId) {
+        return userRepository.findByGroupGroupId(groupId);
     }
-
 }

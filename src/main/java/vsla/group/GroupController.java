@@ -7,7 +7,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import vsla.group.dto.GroupRegistrationReq;
 import vsla.group.dto.GroupResponse;
-import vsla.userManager.user.dto.UserRegistrationReq;
+import vsla.group.dto.MemberReq;
+import vsla.group.dto.MemberResponse;
 import vsla.userManager.user.dto.UserResponse;
 
 import java.util.List;
@@ -34,7 +35,7 @@ public class GroupController {
     }
 
     @GetMapping("/{groupId}/members")
-    public ResponseEntity<List<UserResponse>> getAllGroupMembers(@PathVariable Long groupId) {
+    public ResponseEntity<MemberResponse> getAllGroupMembers(@PathVariable Long groupId) {
         return ResponseEntity.ok(groupService.getAllGroupMembers(groupId));
     }
 
@@ -50,8 +51,8 @@ public class GroupController {
     }
 
     @PostMapping("/add-member")
-    public ResponseEntity<UserResponse> addMember(@RequestBody @Valid UserRegistrationReq userRegistrationReq) {
-        return ResponseEntity.ok(groupService.addMember(userRegistrationReq));
+    public ResponseEntity<UserResponse> addMember(@RequestBody @Valid MemberReq memberReq) {
+        return ResponseEntity.ok(groupService.addMember(memberReq));
     }
 }
 

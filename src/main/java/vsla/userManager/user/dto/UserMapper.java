@@ -5,12 +5,22 @@ import vsla.userManager.user.Users;
 public class UserMapper {
     public static UserResponse toUserResponse(Users user) {
 
+//        Group group = user.getGroup();
+//        MeetingTypeResponse groupResponse = new MeetingTypeResponse();
+//        if (group != null)
+//            groupResponse = MeetingTypeResponse.builder()
+//                    .groupId(group.getGroupId())
+//                    .groupName(group.getGroupName())
+//                    .build();
+
         return UserResponse.builder()
                 .userId(user.getUserId())
                 .fullName(user.getFullName())
+                .gender(user.getGender())
                 .phoneNumber(user.getUsername())
                 .role(user.getRole().getRoleName())
                 .company(user.getCompany().getCompanyName())
+//                .group(groupResponse)
                 .address(user.getAddress())
                 .userStatus(user.getUserStatus())
                 .lastLoggedIn(user.getLastLoggedIn())
@@ -23,6 +33,7 @@ public class UserMapper {
         return UserResponse.builder()
                 .userId(user.getUserId())
                 .fullName(user.getFullName())
+                .gender(user.getGender())
                 .role(user.getRole().getRoleName())
                 .build();
     }

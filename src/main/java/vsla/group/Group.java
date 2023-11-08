@@ -49,6 +49,6 @@ public class Group {
             this.groupAdmin = groupAdmin;
         else
             // Handle the case where the user doesn't have the "admin" role.
-            throw new IllegalArgumentException("The user must have the 'admin' role to be a group admin.");
+            throw new IllegalArgumentException("The user must have the 'GROUP_ADMIN' role to be a group admin.");
     }
 }

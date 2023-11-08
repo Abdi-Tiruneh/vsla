@@ -1,11 +1,10 @@
 package vsla.security.service;
 
-
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import vsla.exceptions.customExceptions.ResourceNotFoundException;
 import vsla.userManager.user.UserRepository;
 import vsla.userManager.user.Users;
 
@@ -22,7 +21,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public Users loadUserByUsername(String username) throws UsernameNotFoundException {
         Users user = userRepository.findByUsername(username).orElseThrow(
                 () -> new UsernameNotFoundException("There is no user with this username")
         );
@@ -34,9 +33,7 @@ public class CustomUserDetailsService implements UserDetailsService {
                 .map(authority -> new SimpleGrantedAuthority(authority.getAuthority()))
                 .toList();
 
-        return new org.springframework.security.core.userdetails.User(
-                user.getUsername(), user.getPassword(), authorities
-        );
+        return user;
     }
 
     public void updateLastLogin(String username) {
@@ -46,5 +43,11 @@ public class CustomUserDetailsService implements UserDetailsService {
             adminUser.setLastLoggedIn(LocalDateTime.now());
             userRepository.save(adminUser);
         }
+    }
+
+    public Users getByUsername(String username) {
+        return userRepository.findByUsername(username).orElseThrow(
+                () -> new ResourceNotFoundException("User not found")
+        );
     }
 }

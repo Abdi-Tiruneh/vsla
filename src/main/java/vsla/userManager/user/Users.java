@@ -48,6 +48,9 @@ public class Users implements UserDetails {
     @Column(name = "full_name", nullable = false)
     private String fullName;
 
+    @Column(nullable = false)
+    private String gender;
+
     @Column(name = "proxy_enabled", nullable = false)
     private boolean proxyEnabled = Boolean.FALSE;
 
@@ -107,6 +110,13 @@ public class Users implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    public void setGender(String gender) {
+        if ("female".equalsIgnoreCase(gender) || "male".equalsIgnoreCase(gender))
+            this.gender = gender.toUpperCase();
+        else
+            throw new IllegalArgumentException("Invalid gender. Please use 'female' or 'male'.");
     }
 
 }

@@ -5,10 +5,10 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import vsla.exceptions.customExceptions.BadRequestException;
 import vsla.exceptions.customExceptions.ResourceAlreadyExistsException;
-import vsla.group.dto.GroupMapper;
-import vsla.group.dto.GroupRegistrationReq;
-import vsla.group.dto.GroupResponse;
+import vsla.group.dto.*;
+import vsla.meeting.meeting.MeetingService;
 import vsla.userManager.address.Address;
 import vsla.userManager.address.AddressService;
 import vsla.userManager.company.Company;
@@ -19,7 +19,6 @@ import vsla.userManager.user.UserService;
 import vsla.userManager.user.UserStatus;
 import vsla.userManager.user.Users;
 import vsla.userManager.user.dto.UserMapper;
-import vsla.userManager.user.dto.UserRegistrationReq;
 import vsla.userManager.user.dto.UserResponse;
 import vsla.utils.CurrentlyLoggedInUser;
 
@@ -35,10 +34,11 @@ public class GroupServiceImpl implements GroupService {
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final UserService userService;
+    private final MeetingService meetingService;
 
     @Override
     @Transactional
-    @PreAuthorize("hasAuthority('GROUP_ADMIN')")
+//    @PreAuthorize("hasAuthority('GROUP_ADMIN')")
     public GroupResponse createGroup(GroupRegistrationReq groupReq) {
         // Retrieve the currently logged-in user
         Users loggedInUser = currentlyLoggedInUser.getUser();
@@ -63,6 +63,9 @@ public class GroupServiceImpl implements GroupService {
         // Update the user's group membership
         updateUser(loggedInUser, group);
 
+        //create default meeting for the group
+        meetingService.createDefaultMeeting(group, groupReq.getMeetingIntervalId(), groupReq.getMeetingDate());
+
         return GroupMapper.toGroupResponse(group);
     }
 
@@ -72,7 +75,6 @@ public class GroupServiceImpl implements GroupService {
         userRepository.save(user);
     }
 
-
     @Override
     public GroupResponse updateGroup(GroupRegistrationReq groupReq) {
         return null;
@@ -81,30 +83,31 @@ public class GroupServiceImpl implements GroupService {
     @Override
     @PreAuthorize("hasAuthority('GROUP_ADMIN')")
     @Transactional
-    public UserResponse addMember(UserRegistrationReq userReq) {
-        // Check if the phone number is already taken
-        if (userRepository.findByUsername(userReq.getPhoneNumber()).isPresent())
-            throw new ResourceAlreadyExistsException("Phone number is already taken");
-
+    public UserResponse addMember(MemberReq memberReq) {
         Users loggedInUser = currentlyLoggedInUser.getUser();
-
-        // Retrieve the user's role
-        Role role = roleService.getRoleById(userReq.getRoleId());
-
-        // Create an address for the new user
-        Address address = addressService.addAddress(userReq.getAddress());
-
         // Get the user's company and group
         Company company = loggedInUser.getCompany();
         Group group = loggedInUser.getGroup();
+        if (group == null)
+            throw new BadRequestException("You cannot add a member to a non-existing group.");
+
+        // Check if the phone number is already taken
+        if (userRepository.findByUsername(memberReq.getPhoneNumber()).isPresent())
+            throw new ResourceAlreadyExistsException("Phone number is already taken");
+
+        // Retrieve the user's role
+        Role role = roleService.getRoleByRoleName(memberReq.getRoleName());
+
+        // Create an address for the new user
+        Address address = addressService.addAddress(memberReq.getAddress());
 
         // Create a new user
-
         Users user = Users.builder()
-                .username(userReq.getPhoneNumber())
-                .password(passwordEncoder.encode(userReq.getPassword()))
-                .fullName(userReq.getFullName())
-                .proxyEnabled(userReq.isProxyEnabled())
+                .username(memberReq.getPhoneNumber())
+                .password(passwordEncoder.encode(memberReq.getPassword()))
+                .fullName(memberReq.getFullName())
+                .gender(memberReq.getGender())
+                .proxyEnabled(memberReq.isProxyEnabled())
                 .role(role)
                 .group(group)
                 .address(address)
@@ -130,8 +133,10 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public List<UserResponse> getAllGroupMembers(Long groupId) {
-        return userService.getUsersByGroup(groupId);
+    public MemberResponse getAllGroupMembers(Long groupId) {
+        List<Users> users = userService.getUsersByGroup(groupId);
+
+        return MemberResponse.toResponse(users);
     }
 
 

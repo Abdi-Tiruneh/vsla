@@ -29,4 +29,9 @@ public class RoleService {
                 .orElseThrow(() -> new ResourceNotFoundException("Role not found."));
     }
 
+    public Role getRoleByRoleName(String roleName) {
+        return roleRepository.findByRoleNameIgnoreCase(roleName)
+                .orElseThrow(() -> new ResourceNotFoundException("Role not found."));
+    }
+
 }

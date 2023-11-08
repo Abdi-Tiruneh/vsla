@@ -8,13 +8,16 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import vsla.userManager.user.Users;
 
 import java.util.Date;
 import java.util.List;
 
 @Service
 public class JwtTokenUtil {
-    private static final long ACCESS_TOKEN_EXPIRATION_TIME = 7 * 24 * 60 * 60 * 1000; // one week
+
+    //TODO: update expiration time
+    private static final long ACCESS_TOKEN_EXPIRATION_TIME = 7 * 24 * 60 * 60 * 1000 * 5L; // five week
     private static final long REFRESH_TOKEN_EXPIRATION_TIME = 30L * 24L * 60L * 60L * 1000L; // 1 month
     public static String SECRET_KEY;
     private static CustomUserDetailsService customUserDetailsService;
@@ -24,19 +27,25 @@ public class JwtTokenUtil {
         JwtTokenUtil.customUserDetailsService = customUserDetailsService;
     }
 
-    public static String generateAccessToken(UserDetails user) {
-        customUserDetailsService.updateLastLogin(user.getUsername());
+    public static String generateAccessToken(UserDetails userDetails) {
+        String username = userDetails.getUsername();
 
-        List<String> role = user.getAuthorities().stream()
+        customUserDetailsService.updateLastLogin(username);
+        Users user = customUserDetailsService.getByUsername(username);
+
+        List<String> role = userDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .toList();
 
+        String hasGroup = user.getGroup() != null ? "Yes" : "No";
+
         return JWT.create()
-                .withSubject(user.getUsername())
+                .withSubject(username)
                 .withIssuedAt(new Date())
                 .withExpiresAt(new Date(System.currentTimeMillis() + ACCESS_TOKEN_EXPIRATION_TIME))
                 .withClaim("role", role)
-                .withIssuer("Store Management App")
+                .withClaim("has-group", hasGroup)
+                .withIssuer("Vsla App")
                 .sign(Algorithm.HMAC256(SECRET_KEY.getBytes()));
     }
 

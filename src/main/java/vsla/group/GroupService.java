@@ -2,7 +2,8 @@ package vsla.group;
 
 import vsla.group.dto.GroupRegistrationReq;
 import vsla.group.dto.GroupResponse;
-import vsla.userManager.user.dto.UserRegistrationReq;
+import vsla.group.dto.MemberReq;
+import vsla.group.dto.MemberResponse;
 import vsla.userManager.user.dto.UserResponse;
 
 import java.util.List;
@@ -12,11 +13,11 @@ public interface GroupService {
 
     GroupResponse updateGroup(GroupRegistrationReq groupReq);
 
-    UserResponse addMember(UserRegistrationReq userRegistrationReq);
+    UserResponse addMember(MemberReq memberReq);
 
     List<GroupResponse> getAllGroups();
 
     GroupResponse myGroup();
 
-    List<UserResponse> getAllGroupMembers(Long groupId);
+    MemberResponse getAllGroupMembers(Long groupId);
 }

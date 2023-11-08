@@ -13,7 +13,7 @@ public interface UserService {
 
     List<UserResponse> getAllUsers();
 
-    List<UserResponse> getUsersByGroup(Long groupId);
+    List<Users> getUsersByGroup(Long groupId);
 
     UserResponse editUser(UserUpdateReq updateReq);
 }

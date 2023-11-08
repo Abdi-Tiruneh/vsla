@@ -73,6 +73,12 @@
             <version>3.0.0</version>
         </dependency>
 
+        <!--caching-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.boot</groupId>-->
+<!--            <artifactId>spring-boot-starter-cache</artifactId>-->
+<!--        </dependency>-->
+
         <!-- Other Dependencies -->
         <dependency>
             <groupId>org.projectlombok</groupId>
