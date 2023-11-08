@@ -38,14 +38,14 @@ public class JwtTokenUtil {
                 .toList();
 
         String hasGroup = user.getGroup() != null ? "Yes" : "No";
-
+        Long groupId=user.getGroup()!=null?user.getGroup().getGroupId():null; 
         return JWT.create()
                 .withSubject(username)
                 .withIssuedAt(new Date())
                 .withExpiresAt(new Date(System.currentTimeMillis() + ACCESS_TOKEN_EXPIRATION_TIME))
                 .withClaim("role", role)
                 .withClaim("has-group", hasGroup)
-                .withClaim("groupId", user.getGroup().getGroupId())
+                .withClaim("groupId", groupId)
                 .withIssuer("Vsla App")
                 .sign(Algorithm.HMAC256(SECRET_KEY.getBytes()));
     }
