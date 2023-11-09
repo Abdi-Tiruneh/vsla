@@ -85,7 +85,7 @@ public class Users implements UserDetails {
     private LocalDateTime updatedAt;
 
     @JsonIgnore
-    private boolean deleted = Boolean.FALSE;
+    private Boolean deleted = Boolean.FALSE;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

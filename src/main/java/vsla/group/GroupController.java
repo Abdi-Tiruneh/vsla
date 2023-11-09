@@ -9,6 +9,7 @@ import vsla.group.dto.GroupRegistrationReq;
 import vsla.group.dto.GroupResponse;
 import vsla.group.dto.MemberReq;
 import vsla.group.dto.MemberResponse;
+import vsla.group.dto.UpdateMemberReq;
 import vsla.userManager.user.dto.UserResponse;
 
 import java.util.List;
@@ -53,6 +54,14 @@ public class GroupController {
     @PostMapping("/add-member")
     public ResponseEntity<UserResponse> addMember(@RequestBody @Valid MemberReq memberReq) {
         return ResponseEntity.ok(groupService.addMember(memberReq));
+    }
+    @PutMapping("/edit-member/{userId}")
+    public ResponseEntity<UserResponse> editMember(@RequestBody @Valid UpdateMemberReq updateMemberReq,@PathVariable Long userId) {
+        return ResponseEntity.ok(groupService.editMember(updateMemberReq,userId));
+    }
+    @DeleteMapping("/delete-member/{userId}")
+    public ResponseEntity<UserResponse> deleteMember(@PathVariable Long userId) {
+        return ResponseEntity.ok(groupService.deleteMember(userId));
     }
 }
 

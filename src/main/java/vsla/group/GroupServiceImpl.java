@@ -1,6 +1,8 @@
 package vsla.group;
 
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.boot.autoconfigure.security.SecurityProperties.User;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -22,7 +24,9 @@ import vsla.userManager.user.dto.UserMapper;
 import vsla.userManager.user.dto.UserResponse;
 import vsla.utils.CurrentlyLoggedInUser;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -135,8 +139,15 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public MemberResponse getAllGroupMembers(Long groupId) {
         List<Users> users = userService.getUsersByGroup(groupId);
+        List<Users> enabledUsers= new ArrayList<Users>();
+        users.stream().forEach(u->{
+            if(u.getDeleted()==false)
+            {
+                enabledUsers.add(u);
+            }
+        });
 
-        return MemberResponse.toResponse(users);
+        return MemberResponse.toResponse(enabledUsers);
     }
 
 
@@ -144,5 +155,64 @@ public class GroupServiceImpl implements GroupService {
     public GroupResponse myGroup() {
         Group group = currentlyLoggedInUser.getUser().getGroup();
         return GroupMapper.toGroupResponse(group);
+    }
+
+
+    @Override
+    @PreAuthorize("hasAuthority('GROUP_ADMIN')")
+    @Transactional
+    public UserResponse editMember(UpdateMemberReq updateMemberReq,Long userId) {
+        Users loggedInUser = currentlyLoggedInUser.getUser();
+        // Get the user's company and group
+        Group group = loggedInUser.getGroup();
+        if (group == null)
+            throw new BadRequestException("You cannot edit a member to a non-existing group.");
+
+        // Check if the phone number is already taken
+            Users memeberToBeEdited=userRepository.findUsersByUserId(userId);
+            if(memeberToBeEdited==null)
+            {
+                throw new BadRequestException("member does not exist");
+            }
+            else{
+                memeberToBeEdited.setUsername("");
+                userRepository.save(memeberToBeEdited);
+                if (userRepository.findByUsername(updateMemberReq.getPhoneNumber()).isPresent())
+                {
+                           throw new ResourceAlreadyExistsException("Phone number is already taken");
+                }
+                else{
+                     memeberToBeEdited.setFullName(updateMemberReq.getFullName());
+                memeberToBeEdited.setUsername(updateMemberReq.getPhoneNumber());
+                memeberToBeEdited.setProxyEnabled(updateMemberReq.getProxyEnabled());
+                Users editedUser=userRepository.save(memeberToBeEdited);
+                 return UserMapper.toUserResponse(editedUser);
+                }
+         
+               
+            }
+
+      
+    }
+
+
+    @Override
+    @PreAuthorize("hasAuthority('GROUP_ADMIN')")
+    @Transactional
+    public UserResponse deleteMember(Long userId) {
+         Users loggedInUser = currentlyLoggedInUser.getUser();
+        // Get the user's company and group
+        Group group = loggedInUser.getGroup();
+        if (group == null)
+            throw new BadRequestException("You cannot delete a member to a non-existing group.");
+       Users user=userRepository.findUsersByUserId(userId);
+       if(user==null)
+       {
+        throw new BadRequestException("member does not exist");
+       }
+       else{
+        user.setDeleted(true);
+        return UserMapper.toUserResponse(user);
+       }
     }
 }
