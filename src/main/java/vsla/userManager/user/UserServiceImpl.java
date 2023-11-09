@@ -9,6 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vsla.exceptions.customExceptions.ResourceAlreadyExistsException;
+import vsla.exceptions.customExceptions.ResourceNotFoundException;
 import vsla.userManager.address.AddressService;
 import vsla.userManager.company.Company;
 import vsla.userManager.company.CompanyService;
@@ -89,6 +90,13 @@ public class UserServiceImpl implements UserService {
     public UserResponse me() {
         Users user = currentlyLoggedInUser.getUser();
         return UserMapper.toUserResponse(user);
+    }
+
+    //phone number used as username
+    @Override
+    public Users getUserByPhoneNumber(String phoneNumber) {
+        return userRepository.findByUsername(phoneNumber)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
     }
 
     @Override

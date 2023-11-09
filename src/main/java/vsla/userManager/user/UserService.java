@@ -11,6 +11,8 @@ public interface UserService {
 
     UserResponse me();
 
+    Users getUserByPhoneNumber(String phoneNumber);
+
     List<UserResponse> getAllUsers();
 
     List<Users> getUsersByGroup(Long groupId);

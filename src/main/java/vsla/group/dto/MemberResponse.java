@@ -3,6 +3,7 @@ package vsla.group.dto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Data;
+import vsla.group.Group;
 import vsla.userManager.user.Users;
 
 import java.text.DecimalFormat;
@@ -14,6 +15,7 @@ import java.util.Random;
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class MemberResponse {
+    private GroupResponse groupInfo;
     private GenderStatics genderStatics;
     private List<Member> memberList;
 
@@ -39,12 +41,27 @@ public class MemberResponse {
     }
 
     public static MemberResponse toResponse(List<Users> users) {
+        Group group = users.get(0).getGroup();
 
         MemberResponse memberResponse = new MemberResponse();
+        memberResponse.setGroupInfo(groupResponse(group));
         memberResponse.setGenderStatics(genderStatics(users));
         memberResponse.setMemberList(members(users));
         return memberResponse;
     }
+
+    private static GroupResponse groupResponse(Group group) {
+        return GroupResponse.builder()
+                .groupId(group.getGroupId())
+                .groupName(group.getGroupName())
+                .groupSize(group.getGroupSize())
+                .entryFee(group.getEntryFee())
+                .address(group.getAddress())
+                .createdAt(group.getCreatedAt())
+                .updatedAt(group.getUpdatedAt())
+                .build();
+    }
+
 
     private static GenderStatics genderStatics(List<Users> users) {
 

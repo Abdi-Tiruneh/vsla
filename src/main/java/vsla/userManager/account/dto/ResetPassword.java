@@ -1,12 +1,12 @@
 package vsla.userManager.account.dto;
 
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
 public class ResetPassword {
-    @NotEmpty(message = "password is required field")
-    private String password;
-    @NotEmpty(message = "Token is required field")
-    private String token;
+    @Size(min = 4, message = "Password must be at least 4 characters long")
+    @NotEmpty(message = "newPassword is required")
+    private String newPassword;
 }

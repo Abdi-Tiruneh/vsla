@@ -1,5 +1,6 @@
 package vsla.userManager.address;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -36,8 +37,10 @@ public class Address {
 
     @CreationTimestamp
     @Column(name = "created_at")
+    @JsonIgnore
     private LocalDateTime createdAt;
 
+    @JsonIgnore
     @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
