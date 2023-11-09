@@ -24,7 +24,7 @@ public class RoleService {
     }
 
     // Retrieves a role by id.
-    public Role getRoleById(Short roleId) {
+    public Role getRoleById(Long roleId) {
         return roleRepository.findById(roleId)
                 .orElseThrow(() -> new ResourceNotFoundException("Role not found."));
     }

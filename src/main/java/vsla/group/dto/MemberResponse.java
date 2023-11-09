@@ -25,6 +25,7 @@ public class MemberResponse {
         private String fullName;
         private String gender;
         private Boolean proxy;
+        private String phoneNumber;
         private Double totalOwning;
         private Double loanBalance;
         private Double paid;
@@ -83,6 +84,7 @@ public class MemberResponse {
                     .fullName(user.getFullName())
                     .gender(user.getGender())
                     .proxy(user.isProxyEnabled())
+                    .phoneNumber(user.getUsername())
                     .totalOwning(Double.parseDouble(df.format(totalOwning)))
                     .loanBalance(Double.parseDouble(df.format(loanBalance)))
                     .paid(Double.parseDouble(df.format(paid)))
