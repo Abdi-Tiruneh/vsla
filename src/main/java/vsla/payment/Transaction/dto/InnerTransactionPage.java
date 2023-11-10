@@ -9,6 +9,7 @@ import lombok.Data;
  */
  public class InnerTransactionPage {
     private String name;
+    private String gender;
     private String status;
     private String amount;
  }
