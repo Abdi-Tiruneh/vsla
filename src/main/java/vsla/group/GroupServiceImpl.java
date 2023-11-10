@@ -113,6 +113,7 @@ public class GroupServiceImpl implements GroupService {
                 .gender(memberReq.getGender())
                 .proxyEnabled(memberReq.isProxyEnabled())
                 .role(role)
+                .deleted(false)
                 .group(group)
                 .address(address)
                 .company(company)
