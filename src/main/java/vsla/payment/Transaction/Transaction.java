@@ -23,10 +23,12 @@ public class Transaction {
     private Double amount;
 
     private String description;
+    
+    private String status;
 
     private Integer round;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "payer_id")
     private Users payer;
 

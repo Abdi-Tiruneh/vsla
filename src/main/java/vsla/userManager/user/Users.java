@@ -25,7 +25,7 @@ import java.util.Collections;
 @Entity
 @Table(name = "users")
 @SQLDelete(sql = "UPDATE users SET deleted = true WHERE user_Id=?")
-@Where(clause = "deleted=false")
+//@Where(clause = "deleted=false")
 @Builder
 @Data
 @AllArgsConstructor
