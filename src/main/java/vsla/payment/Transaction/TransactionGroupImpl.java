@@ -71,8 +71,9 @@ public class TransactionGroupImpl implements TransactionService {
                     innerTransactionPage.setGender(t.getPayer().getGender());
                     innerTransactionPage.setName(t.getPayer().getFullName());
                     innerTransactionPage.setStatus(t.getStatus());
+                    innerTransactionPages.add(innerTransactionPage);
                 }
-                innerTransactionPages.add(innerTransactionPage);
+                
         });
 
         return innerTransactionPages;
