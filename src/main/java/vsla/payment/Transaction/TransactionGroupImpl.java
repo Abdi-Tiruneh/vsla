@@ -3,7 +3,9 @@ package vsla.payment.Transaction;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import vsla.group.Group;
@@ -22,6 +24,8 @@ public class TransactionGroupImpl implements TransactionService {
     Double loanRepaymnetAmount = 0.0;
 
     @Override
+    @PreAuthorize("hasAuthority('GROUP_ADMIN')")
+    @Transactional
     public TransactionPage getTransactionByGroup(Long groupId) {
         roundPaymentAmount = 0.0;
         loanDespersalAmount = 0.0;
@@ -60,20 +64,22 @@ public class TransactionGroupImpl implements TransactionService {
     }
 
     @Override
+    @PreAuthorize("hasAuthority('GROUP_ADMIN')")
+    @Transactional
     public List<InnerTransactionPage> getSocialFundTransaction(Long groupId) {
-         Group group = groupRepository.findByGroupId(groupId);
+        Group group = groupRepository.findByGroupId(groupId);
         List<Transaction> transactions = transactionRepository.findTransactionByGroup(group);
-        List<InnerTransactionPage> innerTransactionPages= new ArrayList<InnerTransactionPage>();
-        transactions.stream().forEach(t->{
-                InnerTransactionPage innerTransactionPage= new InnerTransactionPage();
-                if(t.getPaymentType().getPaymentTypeId()==4){
-                    innerTransactionPage.setAmount(t.getAmount().toString());
-                    innerTransactionPage.setGender(t.getPayer().getGender());
-                    innerTransactionPage.setName(t.getPayer().getFullName());
-                    innerTransactionPage.setStatus(t.getStatus());
-                    innerTransactionPages.add(innerTransactionPage);
-                }
-                
+        List<InnerTransactionPage> innerTransactionPages = new ArrayList<InnerTransactionPage>();
+        transactions.stream().forEach(t -> {
+            InnerTransactionPage innerTransactionPage = new InnerTransactionPage();
+            if (t.getPaymentType().getPaymentTypeId() == 4) {
+                innerTransactionPage.setAmount(t.getAmount().toString());
+                innerTransactionPage.setGender(t.getPayer().getGender());
+                innerTransactionPage.setName(t.getPayer().getFullName());
+                innerTransactionPage.setStatus(t.getStatus());
+                innerTransactionPages.add(innerTransactionPage);
+            }
+
         });
 
         return innerTransactionPages;
