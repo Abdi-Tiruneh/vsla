@@ -4,9 +4,11 @@ import vsla.group.dto.GroupRegistrationReq;
 import vsla.group.dto.GroupResponse;
 import vsla.group.dto.MemberReq;
 import vsla.group.dto.MemberResponse;
+import vsla.group.dto.MembersDto;
 import vsla.group.dto.UpdateMemberReq;
 import vsla.userManager.user.dto.UserResponse;
 
+import java.lang.reflect.Member;
 import java.util.List;
 
 public interface GroupService {
@@ -22,4 +24,5 @@ public interface GroupService {
     GroupResponse myGroup();
 
     MemberResponse getAllGroupMembers(Long groupId);
+    List<MembersDto> getMembers(Long groupId);
 }

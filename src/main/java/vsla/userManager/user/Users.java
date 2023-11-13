@@ -52,7 +52,7 @@ public class Users implements UserDetails {
     private String gender;
 
     @Column(name = "proxy_enabled", nullable = false)
-    private boolean proxyEnabled = Boolean.FALSE;
+    private Boolean proxyEnabled = Boolean.FALSE;
 
     @Enumerated(EnumType.STRING)
     private UserStatus userStatus;

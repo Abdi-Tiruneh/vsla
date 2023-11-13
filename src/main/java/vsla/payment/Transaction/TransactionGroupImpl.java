@@ -1,5 +1,7 @@
 package vsla.payment.Transaction;
 
+import java.sql.Date;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,16 +10,24 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
+import vsla.exceptions.customExceptions.BadRequestException;
 import vsla.group.Group;
 import vsla.group.GroupRepository;
+import vsla.group.dto.ContributionDto;
 import vsla.payment.Transaction.dto.InnerTransactionPage;
 import vsla.payment.Transaction.dto.TransactionPage;
+import vsla.payment.paymentType.PaymentType;
+import vsla.payment.paymentType.PaymentTypeRepository;
+import vsla.userManager.user.UserRepository;
+import vsla.userManager.user.Users;
 
 @Service
 @RequiredArgsConstructor
 public class TransactionGroupImpl implements TransactionService {
     private final GroupRepository groupRepository;
     private final TransactionRepository transactionRepository;
+    private final UserRepository userRepository;
+    private final PaymentTypeRepository paymentTypeRepository;
 
     Double roundPaymentAmount = 0.0;
     Double loanDespersalAmount = 0.0;
@@ -83,6 +93,38 @@ public class TransactionGroupImpl implements TransactionService {
         });
 
         return innerTransactionPages;
+    }
+
+    @Override
+    public Transaction addTransaction(ContributionDto contributionDto) {
+       Users payer= userRepository.findUsersByUserId(contributionDto.getPayerId());
+        Group group= groupRepository.findByGroupId(contributionDto.getGroupId());
+        PaymentType paymentType= paymentTypeRepository.findByPaymentTypeId(contributionDto.getPayementTypeId());
+        if(group==null)
+        {
+             throw new BadRequestException("non-existing group.");
+        }
+        if(payer==null)
+        {
+             throw new BadRequestException("non-existing user.");
+        }
+        if(paymentType==null)
+        {
+            throw new BadRequestException("non-existing Paymnet .");
+        }
+
+        Transaction transaction = new Transaction();
+        transaction.setAmount(contributionDto.getAmount());
+        LocalDateTime currentDateAndTime = LocalDateTime.now();
+        transaction.setCreatedAt(currentDateAndTime);
+        transaction.setDescription("round payemnet");
+        transaction.setGroup(group);
+        transaction.setPayer(payer);
+        transaction.setPaymentType(paymentType);
+        transaction.setRound(contributionDto.getRound());
+        transaction.setStatus("Recieved");
+        transactionRepository.save(transaction);
+        return transaction;
     }
 
 }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Data;
 import vsla.group.Group;
+import vsla.payment.Transaction.TransactionRepository;
 import vsla.userManager.user.Users;
 
 import java.text.DecimalFormat;
@@ -27,6 +28,7 @@ public class MemberResponse {
         private String fullName;
         private String gender;
         private Boolean proxy;
+        private Integer round;
         private String phoneNumber;
         private Double totalOwning;
         private Double loanBalance;
@@ -42,7 +44,6 @@ public class MemberResponse {
 
     public static MemberResponse toResponse(List<Users> users) {
         Group group = users.get(0).getGroup();
-
         MemberResponse memberResponse = new MemberResponse();
         memberResponse.setGroupInfo(groupResponse(group));
         memberResponse.setGenderStatics(genderStatics(users));
@@ -95,12 +96,12 @@ public class MemberResponse {
             if (loanBalance < paid) {
                 loanBalance = paid;
             }
-
+            
             Member member = Member.builder()
                     .userId(user.getUserId())
                     .fullName(user.getFullName())
                     .gender(user.getGender())
-                    .proxy(user.isProxyEnabled())
+                    .proxy(user.getProxyEnabled())
                     .phoneNumber(user.getUsername())
                     .totalOwning(Double.parseDouble(df.format(totalOwning)))
                     .loanBalance(Double.parseDouble(df.format(loanBalance)))

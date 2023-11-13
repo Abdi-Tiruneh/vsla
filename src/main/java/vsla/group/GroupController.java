@@ -9,6 +9,7 @@ import vsla.group.dto.GroupRegistrationReq;
 import vsla.group.dto.GroupResponse;
 import vsla.group.dto.MemberReq;
 import vsla.group.dto.MemberResponse;
+import vsla.group.dto.MembersDto;
 import vsla.group.dto.UpdateMemberReq;
 import vsla.userManager.user.dto.UserResponse;
 
@@ -38,6 +39,10 @@ public class GroupController {
     @GetMapping("/{groupId}/members")
     public ResponseEntity<MemberResponse> getAllGroupMembers(@PathVariable Long groupId) {
         return ResponseEntity.ok(groupService.getAllGroupMembers(groupId));
+    }
+     @GetMapping("/{groupId}/constributors")
+    public ResponseEntity<List<MembersDto>> getConconstributorsMembers(@PathVariable Long groupId) {
+        return ResponseEntity.ok(groupService.getMembers(groupId));
     }
 
     @PostMapping

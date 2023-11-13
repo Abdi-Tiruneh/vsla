@@ -5,5 +5,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface PaymentTypeRepository extends JpaRepository<PaymentType, Long> {
-
+    PaymentType findByPaymentTypeId(Long paymentTypeId);
 }

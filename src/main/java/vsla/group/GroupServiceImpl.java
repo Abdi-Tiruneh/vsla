@@ -11,6 +11,8 @@ import vsla.exceptions.customExceptions.BadRequestException;
 import vsla.exceptions.customExceptions.ResourceAlreadyExistsException;
 import vsla.group.dto.*;
 import vsla.meeting.meeting.MeetingService;
+import vsla.payment.Transaction.Transaction;
+import vsla.payment.Transaction.TransactionRepository;
 import vsla.userManager.address.Address;
 import vsla.userManager.address.AddressService;
 import vsla.userManager.company.Company;
@@ -24,6 +26,8 @@ import vsla.userManager.user.dto.UserMapper;
 import vsla.userManager.user.dto.UserResponse;
 import vsla.utils.CurrentlyLoggedInUser;
 
+import java.lang.reflect.Member;
+import java.nio.channels.MembershipKey;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -39,17 +43,19 @@ public class GroupServiceImpl implements GroupService {
     private final UserRepository userRepository;
     private final UserService userService;
     private final MeetingService meetingService;
+    private final TransactionRepository transactionRepository;
 
     @Override
     @Transactional
-//    @PreAuthorize("hasAuthority('GROUP_ADMIN')")
+    // @PreAuthorize("hasAuthority('GROUP_ADMIN')")
     public GroupResponse createGroup(GroupRegistrationReq groupReq) {
         // Retrieve the currently logged-in user
         Users loggedInUser = currentlyLoggedInUser.getUser();
 
         // Check if the user is already a member of a group
         if (loggedInUser.getGroup() != null)
-            throw new IllegalArgumentException("You are currently a member of the '" + loggedInUser.getGroup().getGroupName() + "' group.");
+            throw new IllegalArgumentException(
+                    "You are currently a member of the '" + loggedInUser.getGroup().getGroupName() + "' group.");
 
         // Create an address for the group
         Address address = addressService.addAddress(groupReq.getAddress());
@@ -67,12 +73,11 @@ public class GroupServiceImpl implements GroupService {
         // Update the user's group membership
         updateUser(loggedInUser, group);
 
-        //create default meeting for the group
+        // create default meeting for the group
         meetingService.createDefaultMeeting(group, groupReq.getMeetingIntervalId(), groupReq.getMeetingDate());
 
         return GroupMapper.toGroupResponse(group);
     }
-
 
     private void updateUser(Users user, Group group) {
         user.setGroup(group);
@@ -127,8 +132,9 @@ public class GroupServiceImpl implements GroupService {
         return UserMapper.toUserResponse(user);
     }
 
-
-    @Override
+     @Override
+    @PreAuthorize("hasAuthority('GROUP_ADMIN')")
+    @Transactional
     public List<GroupResponse> getAllGroups() {
         List<Group> groups = groupRepository.findAll();
 
@@ -137,13 +143,14 @@ public class GroupServiceImpl implements GroupService {
                 .toList();
     }
 
-    @Override
+     @Override
+    @PreAuthorize("hasAuthority('GROUP_ADMIN')")
+    @Transactional
     public MemberResponse getAllGroupMembers(Long groupId) {
         List<Users> users = userService.getUsersByGroup(groupId);
-        List<Users> enabledUsers= new ArrayList<Users>();
-        users.stream().forEach(u->{
-            if(u.getDeleted()==false)
-            {
+        List<Users> enabledUsers = new ArrayList<Users>();
+        users.stream().forEach(u -> {
+            if (u.getDeleted() == false) {
                 enabledUsers.add(u);
             }
         });
@@ -151,18 +158,16 @@ public class GroupServiceImpl implements GroupService {
         return MemberResponse.toResponse(enabledUsers);
     }
 
-
     @Override
     public GroupResponse myGroup() {
         Group group = currentlyLoggedInUser.getUser().getGroup();
         return GroupMapper.toGroupResponse(group);
     }
 
-
     @Override
     @PreAuthorize("hasAuthority('GROUP_ADMIN')")
     @Transactional
-    public UserResponse editMember(UpdateMemberReq updateMemberReq,Long userId) {
+    public UserResponse editMember(UpdateMemberReq updateMemberReq, Long userId) {
         Users loggedInUser = currentlyLoggedInUser.getUser();
         // Get the user's company and group
         Group group = loggedInUser.getGroup();
@@ -170,50 +175,69 @@ public class GroupServiceImpl implements GroupService {
             throw new BadRequestException("You cannot edit a member to a non-existing group.");
 
         // Check if the phone number is already taken
-            Users memeberToBeEdited=userRepository.findUsersByUserId(userId);
-            if(memeberToBeEdited==null)
-            {
-                throw new BadRequestException("member does not exist");
-            }
-            else{
-                memeberToBeEdited.setUsername("");
-                userRepository.save(memeberToBeEdited);
-                if (userRepository.findByUsername(updateMemberReq.getPhoneNumber()).isPresent())
-                {
-                           throw new ResourceAlreadyExistsException("Phone number is already taken");
-                }
-                else{
-                     memeberToBeEdited.setFullName(updateMemberReq.getFullName());
+        Users memeberToBeEdited = userRepository.findUsersByUserId(userId);
+        if (memeberToBeEdited == null) {
+            throw new BadRequestException("member does not exist");
+        } else {
+            memeberToBeEdited.setUsername("");
+            userRepository.save(memeberToBeEdited);
+            if (userRepository.findByUsername(updateMemberReq.getPhoneNumber()).isPresent()) {
+                throw new ResourceAlreadyExistsException("Phone number is already taken");
+            } else {
+                memeberToBeEdited.setFullName(updateMemberReq.getFullName());
                 memeberToBeEdited.setUsername(updateMemberReq.getPhoneNumber());
                 memeberToBeEdited.setProxyEnabled(updateMemberReq.getProxyEnabled());
-                Users editedUser=userRepository.save(memeberToBeEdited);
-                 return UserMapper.toUserResponse(editedUser);
-                }
-         
-               
+                Users editedUser = userRepository.save(memeberToBeEdited);
+                return UserMapper.toUserResponse(editedUser);
             }
 
-      
-    }
+        }
 
+    }
 
     @Override
     @PreAuthorize("hasAuthority('GROUP_ADMIN')")
     @Transactional
     public UserResponse deleteMember(Long userId) {
-         Users loggedInUser = currentlyLoggedInUser.getUser();
+        Users loggedInUser = currentlyLoggedInUser.getUser();
         // Get the user's company and group
         Group group = loggedInUser.getGroup();
         if (group == null)
             throw new BadRequestException("You cannot delete a member to a non-existing group.");
-       Users user=userRepository.findUsersByUserId(userId);
-       if(user==null)
-       {
-        throw new BadRequestException("member does not exist");
-       }
-       else{
-        user.setDeleted(true);
-        return UserMapper.toUserResponse(user);
-       }
+        Users user = userRepository.findUsersByUserId(userId);
+        if (user == null) {
+            throw new BadRequestException("member does not exist");
+        } else {
+            user.setDeleted(true);
+            return UserMapper.toUserResponse(user);
+        }
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority('GROUP_ADMIN')")
+    @Transactional
+    public List<MembersDto> getMembers(Long groupId) {
+        List<MembersDto> members = new ArrayList<MembersDto>();
+        List<Users> users = userRepository.findByGroupGroupId(groupId);
+        users.stream().forEach(u -> {
+            if (u.getDeleted() == false) {
+                MembersDto member = new MembersDto();
+                member.setUserId(u.getUserId().toString());
+                member.setFullName(u.getFullName());
+                member.setGender(u.getGender());
+                member.setProxy(u.getProxyEnabled().toString());
+                List<Transaction> transactions = transactionRepository.findTransactionByPayer(u);
+
+                Optional<Integer> highestRound = transactions.stream()
+                        .map(Transaction::getRound)
+                        .max(Integer::compare);
+
+                int roundValue = highestRound.orElse(0); // provide a default value if the optional is empty
+                member.setRound(String.valueOf(roundValue+1));
+
+                members.add(member);
+            }
+        });
+        return members;
     }
 }

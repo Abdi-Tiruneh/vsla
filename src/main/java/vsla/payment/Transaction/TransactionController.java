@@ -4,13 +4,20 @@ package vsla.payment.Transaction;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+
 import lombok.RequiredArgsConstructor;
+import vsla.group.dto.ContributionDto;
 import vsla.payment.Transaction.dto.InnerTransactionPage;
+import vsla.payment.Transaction.dto.SuccessResponse;
 import vsla.payment.Transaction.dto.TransactionPage;
 
 @RestController
@@ -27,5 +34,11 @@ public class TransactionController {
     @GetMapping("/getAllTransactions/socialFund/{groupId}")
     List<InnerTransactionPage> getTransactionssocialFund(@PathVariable Long groupId) {
         return transactionService.getSocialFundTransaction(groupId);
+    }
+    @PostMapping("/addTransaction")
+    public ResponseEntity<SuccessResponse> getTransactions(@RequestBody ContributionDto contributionDto) {
+        transactionService.addTransaction(contributionDto);
+        SuccessResponse response = new SuccessResponse("success","transaction added succesfully");
+            return new ResponseEntity<SuccessResponse>(response, HttpStatus.BAD_REQUEST);
     }
 }
