@@ -59,4 +59,23 @@ public class TransactionGroupImpl implements TransactionService {
         return transactionPage;
     }
 
+    @Override
+    public List<InnerTransactionPage> getSocialFundTransaction(Long groupId) {
+         Group group = groupRepository.findByGroupId(groupId);
+        List<Transaction> transactions = transactionRepository.findTransactionByGroup(group);
+        List<InnerTransactionPage> innerTransactionPages= new ArrayList<InnerTransactionPage>();
+        transactions.stream().forEach(t->{
+                InnerTransactionPage innerTransactionPage= new InnerTransactionPage();
+                if(t.getPaymentType().getPaymentTypeId()==4){
+                    innerTransactionPage.setAmount(t.getAmount().toString());
+                    innerTransactionPage.setGender(t.getPayer().getGender());
+                    innerTransactionPage.setName(t.getPayer().getFullName());
+                    innerTransactionPage.setStatus(t.getStatus());
+                }
+                innerTransactionPages.add(innerTransactionPage);
+        });
+
+        return innerTransactionPages;
+    }
+
 }
