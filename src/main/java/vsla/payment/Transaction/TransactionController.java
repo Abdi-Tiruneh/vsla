@@ -39,6 +39,6 @@ public class TransactionController {
     public ResponseEntity<SuccessResponse> getTransactions(@RequestBody ContributionDto contributionDto) {
         transactionService.addTransaction(contributionDto);
         SuccessResponse response = new SuccessResponse("success","transaction added succesfully");
-            return new ResponseEntity<SuccessResponse>(response, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<SuccessResponse>(response, HttpStatus.OK);
     }
 }
