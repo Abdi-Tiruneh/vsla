@@ -38,7 +38,7 @@ public class TransactionController {
     @PostMapping("/addTransaction")
     public ResponseEntity<SuccessResponse> getTransactions(@RequestBody ContributionDto contributionDto) {
         transactionService.addTransaction(contributionDto);
-        SuccessResponse response = new SuccessResponse("success","transaction added succesfully");
+        SuccessResponse response = new SuccessResponse("transaction added succesfully","success");
             return new ResponseEntity<SuccessResponse>(response, HttpStatus.OK);
     }
 }
