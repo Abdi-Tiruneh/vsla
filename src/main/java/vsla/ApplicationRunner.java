@@ -69,6 +69,7 @@ public class ApplicationRunner {
                 .gender("MALE")
                 .username("0912345678")
                 .role(role)
+                .proxyEnabled(true)
                 .organization(organizationn)
                 .userStatus(UserStatus.ACTIVE)
                 .build();
