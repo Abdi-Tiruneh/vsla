@@ -10,9 +10,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vsla.exceptions.customExceptions.ResourceAlreadyExistsException;
 import vsla.exceptions.customExceptions.ResourceNotFoundException;
-import vsla.userManager.address.AddressService;
-import vsla.userManager.company.Company;
-import vsla.userManager.company.CompanyService;
+import vsla.organization.organization.Organization;
+import vsla.organization.organization.OrganizationService;
 import vsla.userManager.role.Role;
 import vsla.userManager.role.RoleService;
 import vsla.userManager.user.dto.UserMapper;
@@ -31,8 +30,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final RoleService roleService;
     private final CurrentlyLoggedInUser currentlyLoggedInUser;
-    private final CompanyService companyService;
-    private final AddressService addressService;
+    private final OrganizationService organizationService;
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -50,7 +48,7 @@ public class UserServiceImpl implements UserService {
     //    @Cacheable(key = "#productId")
     private Users createUser(UserRegistrationReq userReq) {
         Role role = roleService.getRoleByRoleName(userReq.getRoleName());
-        Company company = companyService.getCompanyById(userReq.getCompanyId());
+        Organization organization = organizationService.getOrganizationById(userReq.getOrganizationId());
 
         return Users.builder()
                 .username(userReq.getPhoneNumber())
@@ -58,7 +56,7 @@ public class UserServiceImpl implements UserService {
                 .fullName(userReq.getFullName())
                 .gender(userReq.getGender())
                 .role(role)
-                .company(company)
+                .organization(organization)
                 .userStatus(UserStatus.ACTIVE)
                 .build();
     }

@@ -19,7 +19,7 @@ public class UserMapper {
                 .gender(user.getGender())
                 .phoneNumber(user.getUsername())
                 .role(user.getRole().getRoleName())
-                .company(user.getCompany().getCompanyName())
+                .company(user.getOrganization().getOrganizationName())
 //                .group(groupResponse)
                 .address(user.getAddress())
                 .userStatus(user.getUserStatus())

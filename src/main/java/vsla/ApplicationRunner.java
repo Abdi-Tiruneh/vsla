@@ -7,8 +7,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import vsla.userManager.company.Company;
-import vsla.userManager.company.CompanyRepository;
+import vsla.organization.organization.Organization;
+import vsla.organization.organization.OrganizationRepository;
 import vsla.userManager.role.Role;
 import vsla.userManager.role.RoleRepository;
 import vsla.userManager.user.UserRepository;
@@ -25,7 +25,7 @@ public class ApplicationRunner {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
-    private final CompanyRepository companyRepository;
+    private final OrganizationRepository organizationRepository;
 
     /**
      * Initializes the database with preloaded data upon application startup.
@@ -38,15 +38,15 @@ public class ApplicationRunner {
                 List<Role> roles = createUserRole();
                 roles = roleRepository.saveAll(roles);
 
-                // Create and save company
-                Company company = createCompany();
-                companyRepository.save(company);
+                // Create and save organization
+                Organization organization = createOrganization();
+                organizationRepository.save(organization);
 
                 // Create and save user
-                Users johnDoe = createUser(roles.get(0), company);
+                Users johnDoe = createUser(roles.get(0), organization);
                 userRepository.save(johnDoe);
 
-                log.info("ApplicationRunner => Preloaded company, roles and admin user");
+                log.info("ApplicationRunner => Preloaded organization, roles and admin user");
             } catch (Exception ex) {
                 log.error("ApplicationRunner Preloading Error: {}", ex.getMessage());
                 throw new RuntimeException("ApplicationRunner Preloading Error ", ex);
@@ -62,22 +62,22 @@ public class ApplicationRunner {
         return List.of(groupAdmin, admin, user);
     }
 
-    private Users createUser(Role role, Company company) {
+    private Users createUser(Role role, Organization organizationn) {
         return Users.builder()
                 .password(passwordEncoder.encode("123456"))
                 .fullName("John Doe")
                 .gender("MALE")
                 .username("0912345678")
                 .role(role)
-                .company(company)
+                .organization(organizationn)
                 .userStatus(UserStatus.ACTIVE)
                 .build();
     }
 
-    private Company createCompany() {
-        Company company = new Company();
-        company.setCompanyName("Ethio Care");
+    private Organization createOrganization() {
+        Organization organization = new Organization();
+        organization.setOrganizationName("Ethio Care");
 
-        return company;
+        return organization;
     }
 }

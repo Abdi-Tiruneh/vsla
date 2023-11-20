@@ -28,6 +28,12 @@ public class GroupRegistrationReq {
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate meetingDate;
 
+    @NotNull(message = "projectId is required")
+    private Long projectId;
+
+    @NotNull(message = "groupTypeId is required")
+    private Long groupTypeId;
+
     @NotNull(message = "Meeting Interval is required")
     private Long meetingIntervalId;
 }
