@@ -258,4 +258,32 @@ public class GroupServiceImpl implements GroupService {
         });
         return members;
     }
+    @Override
+    @PreAuthorize("hasAuthority('GROUP_ADMIN')")
+    @Transactional
+    public List<MembersDto> getMembersForSocial(Long groupId) {
+        List<MembersDto> members = new ArrayList<MembersDto>();
+        List<Users> users = userRepository.findByGroupGroupId(groupId);
+        users.stream().forEach(u -> {
+            if (u.getDeleted() == false) {
+                MembersDto member = new MembersDto();
+                member.setUserId(u.getUserId().toString());
+                member.setFullName(u.getFullName());
+                member.setGender(u.getGender());
+                member.setProxy(u.getProxyEnabled().toString());
+                List<Transaction> transactions = transactionRepository.findTransactionByPayer(u);
+
+                Optional<Integer> highestRound = transactions.stream()
+                        .filter(t->t.getPaymentType().getPaymentTypeId()==4)
+                        .map(Transaction::getRound)
+                        .max(Integer::compare);
+
+                int roundValue = highestRound.orElse(0); // provide a default value if the optional is empty
+                member.setRound(String.valueOf(roundValue+1));
+
+                members.add(member);
+            }
+        });
+        return members;
+    }
 }

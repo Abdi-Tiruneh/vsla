@@ -19,4 +19,5 @@ public interface GroupService {
     GroupResponse myGroup();
     MemberResponse getAllGroupMembers(Long groupId);
     List<MembersDto> getMembers(Long groupId);
+    List<MembersDto> getMembersForSocial(Long groupId);
 }

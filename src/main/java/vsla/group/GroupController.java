@@ -41,8 +41,12 @@ public class GroupController {
         return ResponseEntity.ok(groupService.getAllGroupMembers(groupId));
     }
 
-    @GetMapping("/{groupId}/constributors")
+    @GetMapping("/{groupId}/constributors/roundPayment")
     public ResponseEntity<List<MembersDto>> getConconstributorsMembers(@PathVariable Long groupId) {
+        return ResponseEntity.ok(groupService.getMembers(groupId));
+    }
+    @GetMapping("/{groupId}/contributors/socialFund")
+    public ResponseEntity<List<MembersDto>> getSocialFundMembers(@PathVariable Long groupId) {
         return ResponseEntity.ok(groupService.getMembers(groupId));
     }
 
