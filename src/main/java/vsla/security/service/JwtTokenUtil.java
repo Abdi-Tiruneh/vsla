@@ -38,7 +38,10 @@ public class JwtTokenUtil {
                 .toList();
 
         String hasGroup = user.getGroup() != null ? "Yes" : "No";
-        Long groupId=user.getGroup()!=null?user.getGroup().getGroupId():null; 
+        Long groupId = user.getGroup() != null ? user.getGroup().getGroupId() : null;
+
+        Long orgId = user.getOrganization().getOrganizationId();
+
         return JWT.create()
                 .withSubject(username)
                 .withIssuedAt(new Date())
@@ -46,6 +49,7 @@ public class JwtTokenUtil {
                 .withClaim("role", role)
                 .withClaim("has-group", hasGroup)
                 .withClaim("groupId", groupId)
+                .withClaim("orgId", orgId)
                 .withIssuer("Vsla App")
                 .sign(Algorithm.HMAC256(SECRET_KEY.getBytes()));
     }
