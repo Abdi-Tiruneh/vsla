@@ -32,7 +32,7 @@ public class GroupTypeController {
         return ResponseEntity.ok(groupTypeService.updateGroupType(groupTypeId, updateReq));
     }
 
-    @GetMapping("/organization/{organizationId}")
+    @GetMapping("/by-organization/{organizationId}")
     public ResponseEntity<List<GroupType>> getAllGroupTypes(@PathVariable Long organizationId) {
         return ResponseEntity.ok(groupTypeService.getAllGroupTypesByOrganization(organizationId));
     }
