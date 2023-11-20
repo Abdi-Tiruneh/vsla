@@ -54,6 +54,8 @@ public class UserServiceImpl implements UserService {
                 .username(userReq.getPhoneNumber())
                 .password(passwordEncoder.encode(userReq.getPassword()))
                 .fullName(userReq.getFullName())
+                .deleted(false)
+                .proxyEnabled(userReq.getProxyEnabled())
                 .gender(userReq.getGender())
                 .role(role)
                 .organization(organization)

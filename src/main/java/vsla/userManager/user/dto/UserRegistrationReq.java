@@ -17,6 +17,8 @@ public class UserRegistrationReq {
     @Pattern(regexp = "^(?i)(MALE|FEMALE)$", message = "Gender Must be 'MALE' or 'FEMALE'")
     private String gender;
 
+    private Boolean proxyEnabled;
+
     @NotBlank(message = "Phone Number is required")
     private String phoneNumber;
 
