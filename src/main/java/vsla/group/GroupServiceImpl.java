@@ -1,8 +1,6 @@
 package vsla.group;
 
 import lombok.RequiredArgsConstructor;
-
-import org.springframework.boot.autoconfigure.security.SecurityProperties.User;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -11,11 +9,15 @@ import vsla.exceptions.customExceptions.BadRequestException;
 import vsla.exceptions.customExceptions.ResourceAlreadyExistsException;
 import vsla.group.dto.*;
 import vsla.meeting.meeting.MeetingService;
+import vsla.organization.groupType.GroupType;
+import vsla.organization.groupType.GroupTypeService;
+import vsla.organization.organization.Organization;
+import vsla.organization.project.Project;
+import vsla.organization.project.ProjectService;
 import vsla.payment.Transaction.Transaction;
 import vsla.payment.Transaction.TransactionRepository;
 import vsla.userManager.address.Address;
 import vsla.userManager.address.AddressService;
-import vsla.userManager.company.Company;
 import vsla.userManager.role.Role;
 import vsla.userManager.role.RoleService;
 import vsla.userManager.user.UserRepository;
@@ -26,8 +28,6 @@ import vsla.userManager.user.dto.UserMapper;
 import vsla.userManager.user.dto.UserResponse;
 import vsla.utils.CurrentlyLoggedInUser;
 
-import java.lang.reflect.Member;
-import java.nio.channels.MembershipKey;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -36,6 +36,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class GroupServiceImpl implements GroupService {
     private final GroupRepository groupRepository;
+    private final GroupTypeService groupTypeService;
+    private final ProjectService projectService;
     private final CurrentlyLoggedInUser currentlyLoggedInUser;
     private final AddressService addressService;
     private final RoleService roleService;
@@ -45,12 +47,14 @@ public class GroupServiceImpl implements GroupService {
     private final MeetingService meetingService;
     private final TransactionRepository transactionRepository;
 
+
     @Override
     @Transactional
     // @PreAuthorize("hasAuthority('GROUP_ADMIN')")
     public GroupResponse createGroup(GroupRegistrationReq groupReq) {
         // Retrieve the currently logged-in user
         Users loggedInUser = currentlyLoggedInUser.getUser();
+        Organization organization = loggedInUser.getOrganization();
 
         // Check if the user is already a member of a group
         if (loggedInUser.getGroup() != null)
@@ -60,6 +64,11 @@ public class GroupServiceImpl implements GroupService {
         // Create an address for the group
         Address address = addressService.addAddress(groupReq.getAddress());
 
+        // Get project and project type
+
+        Project project = projectService.getProjectById(groupReq.getProjectId());
+        GroupType groupType = groupTypeService.getGroupTypeById(groupReq.getGroupTypeId());
+
         // Create a new group
         Group group = new Group();
         group.setGroupAdmin(loggedInUser);
@@ -67,6 +76,9 @@ public class GroupServiceImpl implements GroupService {
         group.setGroupSize(groupReq.getGroupSize());
         group.setEntryFee(groupReq.getEntryFee());
         group.setAddress(address);
+        group.setProject(project);
+        group.setGroupType(groupType);
+        group.setOrganization(organization);
 
         group = groupRepository.save(group);
 
@@ -76,7 +88,7 @@ public class GroupServiceImpl implements GroupService {
         // create default meeting for the group
         meetingService.createDefaultMeeting(group, groupReq.getMeetingIntervalId(), groupReq.getMeetingDate());
 
-        return GroupMapper.toGroupResponse(group);
+        return GroupResponse.toGroupResponse(group);
     }
 
     private void updateUser(Users user, Group group) {
@@ -94,8 +106,8 @@ public class GroupServiceImpl implements GroupService {
     @Transactional
     public UserResponse addMember(MemberReq memberReq) {
         Users loggedInUser = currentlyLoggedInUser.getUser();
-        // Get the user's company and group
-        Company company = loggedInUser.getCompany();
+        // Get the user's organization and group
+        Organization organization = loggedInUser.getOrganization();
         Group group = loggedInUser.getGroup();
         if (group == null)
             throw new BadRequestException("You cannot add a member to a non-existing group.");
@@ -121,7 +133,7 @@ public class GroupServiceImpl implements GroupService {
                 .deleted(false)
                 .group(group)
                 .address(address)
-                .company(company)
+                .organization(organization)
                 .userStatus(UserStatus.ACTIVE)
                 .build();
 
@@ -132,18 +144,23 @@ public class GroupServiceImpl implements GroupService {
         return UserMapper.toUserResponse(user);
     }
 
-     @Override
-    @PreAuthorize("hasAuthority('GROUP_ADMIN')")
-    @Transactional
-    public List<GroupResponse> getAllGroups() {
-        List<Group> groups = groupRepository.findAll();
-
+    @Override
+    public List<GroupResponse> getAllGroupsByOrganization(Long organizationId) {
+        List<Group> groups = groupRepository.findByOrganizationOrganizationId(organizationId);
         return groups.stream()
-                .map(GroupMapper::toGroupResponse)
+                .map(GroupResponse::toGroupResponse)
                 .toList();
     }
 
-     @Override
+    @Override
+    public List<GroupResponse> getAllGroupsByProject(Long projectId) {
+        List<Group> groups = groupRepository.findByProjectProjectId(projectId);
+        return groups.stream()
+                .map(GroupResponse::toGroupResponse)
+                .toList();
+    }
+
+    @Override
     @PreAuthorize("hasAuthority('GROUP_ADMIN')")
     @Transactional
     public MemberResponse getAllGroupMembers(Long groupId) {
@@ -161,7 +178,7 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public GroupResponse myGroup() {
         Group group = currentlyLoggedInUser.getUser().getGroup();
-        return GroupMapper.toGroupResponse(group);
+        return GroupResponse.toGroupResponse(group);
     }
 
     @Override
@@ -169,7 +186,7 @@ public class GroupServiceImpl implements GroupService {
     @Transactional
     public UserResponse editMember(UpdateMemberReq updateMemberReq, Long userId) {
         Users loggedInUser = currentlyLoggedInUser.getUser();
-        // Get the user's company and group
+        // Get the user's organization and group
         Group group = loggedInUser.getGroup();
         if (group == null)
             throw new BadRequestException("You cannot edit a member to a non-existing group.");
@@ -200,7 +217,7 @@ public class GroupServiceImpl implements GroupService {
     @Transactional
     public UserResponse deleteMember(Long userId) {
         Users loggedInUser = currentlyLoggedInUser.getUser();
-        // Get the user's company and group
+        // Get the user's organization and group
         Group group = loggedInUser.getGroup();
         if (group == null)
             throw new BadRequestException("You cannot delete a member to a non-existing group.");

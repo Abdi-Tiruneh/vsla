@@ -1,33 +1,39 @@
-package vsla.userManager.company;
+package vsla.organization.project;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.Where;
+import vsla.organization.organization.Organization;
+import vsla.utils.Status;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "companies")
-@SQLDelete(sql = "UPDATE companies SET deleted = true WHERE company_id=?")
+@Table(name = "projects")
+@SQLDelete(sql = "UPDATE projects SET deleted = true WHERE project_id=?")
 @Where(clause = "deleted=false")
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class Company {
+public class Project {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "company_id")
-    private Long companyId;
+    @Column(name = "project_id")
+    private Long projectId;
 
-    @Column(name = "company_name", nullable = false)
-    private String companyName;
+    @Column(name = "project_name", nullable = false)
+    private String projectName;
+
+    @Enumerated(EnumType.STRING)
+    private Status status;
+
+    @ManyToOne
+    @JsonIgnore
+    @JoinColumn(name = "organization_id")
+    private Organization organization;
 
     @CreationTimestamp
     @Column(name = "created_at")

@@ -9,13 +9,12 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.hibernate.annotations.Where;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import vsla.group.Group;
+import vsla.organization.organization.Organization;
 import vsla.userManager.address.Address;
-import vsla.userManager.company.Company;
 import vsla.userManager.role.Role;
 
 import java.time.LocalDateTime;
@@ -66,8 +65,8 @@ public class Users implements UserDetails {
     private Address address;
 
     @ManyToOne
-    @JoinColumn(name = "company_id")
-    private Company company;
+    @JoinColumn(name = "organization_id")
+    private Organization organization;
 
     @ManyToOne
     @JoinColumn(name = "group_id")
@@ -85,7 +84,7 @@ public class Users implements UserDetails {
     private LocalDateTime updatedAt;
 
     @Column(name = "deleted")
-    private Boolean deleted;
+    private Boolean deleted = Boolean.FALSE;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

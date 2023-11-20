@@ -1,9 +1,13 @@
 package vsla.group;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import vsla.organization.groupType.GroupType;
+import vsla.organization.organization.Organization;
+import vsla.organization.project.Project;
 import vsla.userManager.address.Address;
 import vsla.userManager.user.Users;
 
@@ -31,6 +35,20 @@ public class Group {
     @OneToOne
     @JoinColumn(name = "group_admin_id")
     private Users groupAdmin;
+
+    @ManyToOne
+    @JoinColumn(name = "groupType_id", nullable = false)
+    private GroupType groupType;
+
+    @ManyToOne
+    @JsonIgnore
+    @JoinColumn(name = "project_id", nullable = false)
+    private Project project;
+
+    @ManyToOne
+    @JsonIgnore
+    @JoinColumn(name = "organization_id", nullable = false)
+    private Organization organization;
 
     @OneToOne
     @JoinColumn(name = "address_id")

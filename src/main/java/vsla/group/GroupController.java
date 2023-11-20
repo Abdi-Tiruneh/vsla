@@ -5,12 +5,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import vsla.group.dto.GroupRegistrationReq;
-import vsla.group.dto.GroupResponse;
-import vsla.group.dto.MemberReq;
-import vsla.group.dto.MemberResponse;
-import vsla.group.dto.MembersDto;
-import vsla.group.dto.UpdateMemberReq;
+import vsla.group.dto.*;
 import vsla.userManager.user.dto.UserResponse;
 
 import java.util.List;
@@ -31,16 +26,22 @@ public class GroupController {
         return ResponseEntity.ok(groupService.myGroup());
     }
 
-    @GetMapping
-    public ResponseEntity<List<GroupResponse>> getAllGroups() {
-        return ResponseEntity.ok(groupService.getAllGroups());
+    @GetMapping("/by-organization/{organizationId}")
+    public ResponseEntity<List<GroupResponse>> getAllGroups(@PathVariable Long organizationId) {
+        return ResponseEntity.ok(groupService.getAllGroupsByOrganization(organizationId));
+    }
+
+    @GetMapping("/by-project/{projectId}")
+    public ResponseEntity<List<GroupResponse>> getAllGroupsByProject(@PathVariable Long projectId) {
+        return ResponseEntity.ok(groupService.getAllGroupsByProject(projectId));
     }
 
     @GetMapping("/{groupId}/members")
     public ResponseEntity<MemberResponse> getAllGroupMembers(@PathVariable Long groupId) {
         return ResponseEntity.ok(groupService.getAllGroupMembers(groupId));
     }
-     @GetMapping("/{groupId}/constributors")
+
+    @GetMapping("/{groupId}/constributors")
     public ResponseEntity<List<MembersDto>> getConconstributorsMembers(@PathVariable Long groupId) {
         return ResponseEntity.ok(groupService.getMembers(groupId));
     }
