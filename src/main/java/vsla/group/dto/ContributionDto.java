@@ -15,4 +15,6 @@ public class ContributionDto {
     private Double amount;
     @NotBlank(message = "round is Required")
     private Integer round;
+    @NotBlank(message = "description is Required")
+    private String description;
 }

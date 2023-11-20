@@ -229,6 +229,7 @@ public class GroupServiceImpl implements GroupService {
                 List<Transaction> transactions = transactionRepository.findTransactionByPayer(u);
 
                 Optional<Integer> highestRound = transactions.stream()
+                        .filter(t->t.getPaymentType().getPaymentTypeId()==1)
                         .map(Transaction::getRound)
                         .max(Integer::compare);
 
