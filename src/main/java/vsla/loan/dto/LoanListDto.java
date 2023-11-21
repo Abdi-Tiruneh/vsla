@@ -8,4 +8,5 @@ public class LoanListDto {
     private String amount;
     private String updatedDate;
     private String status;
+    private String gender;
 }

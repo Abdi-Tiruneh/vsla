@@ -1,14 +1,18 @@
 package vsla.loan;
 
 import java.text.DecimalFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
+import vsla.loan.dto.LoanAddRequestDto;
 import vsla.loan.dto.LoanListDto;
 import vsla.loan.dto.LoanPageDto;
+import vsla.userManager.user.UserRepository;
 import vsla.userManager.user.Users;
 import vsla.utils.CurrentlyLoggedInUser;
 
@@ -17,6 +21,7 @@ import vsla.utils.CurrentlyLoggedInUser;
 public class LoanServiceImpl implements LoanService {
     private final CurrentlyLoggedInUser loggedInUser;
     private final LoanRepository loanRepository;
+    private final UserRepository userRepository;
     Double pendingAmount = 0.0;
     Double activeAmount = 0.0;
     Double repaidAmount = 0.0;
@@ -36,6 +41,7 @@ public class LoanServiceImpl implements LoanService {
             loanListDto.setAmount(l.getAmount().toString());
             loanListDto.setRequester(l.getLoanRequester().getFullName());
             loanListDto.setStatus(l.getStatus());
+            loanListDto.setGender(l.getLoanRequester().getGender());
             loanListDto.setUpdatedDate(l.getUpdatedAt().toString());
             if (l.getStatus().equals("pending")) {
                 pendingAmount += l.getAmount();
@@ -93,6 +99,23 @@ public class LoanServiceImpl implements LoanService {
         loanPageDto.setLoanListDtos(loanListDtos);
         return loanPageDto;
 
+    }
+
+    @Override
+    public Loan addLoan(LoanAddRequestDto tempLoan, Long userId) {
+      Users user = loggedInUser.getUser();
+      Users requester= userRepository.findUsersByUserId(userId);
+      Loan loan= new Loan();
+      loan.setGroup(user.getGroup());
+      loan.setAmount(tempLoan.getAmount());
+      loan.setDescription(tempLoan.getDescription());
+      loan.setInterest(tempLoan.getInterest());
+      loan.setStatus("pending");
+      loan.setLoanRequester(requester);
+      LocalDateTime today = LocalDateTime.now();
+      loan.setCreatedAt(today);
+      loan.setUpdatedAt(today);
+      return loanRepository.save(loan);
     }
 
 }
