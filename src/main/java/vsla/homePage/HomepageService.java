@@ -2,6 +2,8 @@ package vsla.homePage;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import vsla.payment.Transaction.Transaction;
+import vsla.payment.Transaction.TransactionRepository;
 import vsla.userManager.user.Users;
 import vsla.utils.CurrentlyLoggedInUser;
 
@@ -12,17 +14,63 @@ import java.util.*;
 @RequiredArgsConstructor
 public class HomepageService {
     private final CurrentlyLoggedInUser loggedInUser;
-
+    private final TransactionRepository transactionRepository;
+    double totalSaving =0;
+    double totalSocialFund=0;
+    double totalLoanDespered=0;
+    double totalLoanRepaid=0;
+    double totalSocialFundReleased=0;
     public HomepageResponse getHomepageResponse() {
+        totalSaving=0;
+        totalSocialFund=0;
+        totalLoanDespered=0;
+        totalLoanRepaid=0;
+        totalSocialFundReleased=0;
         Users user = loggedInUser.getUser();
 
 
-        List<RecentContribution> recentContributions = createRandomContributions();
-        double totalAmount = calculateTotalAmount(recentContributions);
-
+        //List<RecentContribution> recentContributions = createRandomContributions();
+        List<RecentContribution> recentContributions= new ArrayList<RecentContribution>();
+        
         HomepageResponse homepageResponse = new HomepageResponse();
         homepageResponse.setGroupName(user.getGroup().getGroupName());
-        homepageResponse.setTotalAmount(totalAmount);
+        List<Transaction> transactions=transactionRepository.findTransactionByGroup(user.getGroup());
+        transactions.stream().forEach(t->{
+            if(t.getPaymentType().getPaymentTypeId()==1)
+            {
+                totalSaving+=t.getAmount();
+            }
+            if(t.getPaymentType().getPaymentTypeId()==2)
+            {
+                totalLoanDespered+=t.getAmount();
+            }
+            if(t.getPaymentType().getPaymentTypeId()==3)
+            {
+                totalLoanRepaid+=t.getAmount();
+            }
+             if(t.getPaymentType().getPaymentTypeId()==4)
+            {
+                totalSocialFund+=t.getAmount();
+            }
+             if(t.getPaymentType().getPaymentTypeId()==5)
+            {
+                totalSocialFundReleased+=t.getAmount();
+            }
+            
+
+        });
+        LocalDate today = LocalDate.now();
+        RecentContribution recentContribution1= new RecentContribution("Total saving", today, totalSaving);
+        RecentContribution recentContribution2= new RecentContribution("Total Social Fund", today, totalSocialFund);
+        RecentContribution recentContribution3= new RecentContribution("Total Loan Disbursed", today, totalLoanDespered);
+        RecentContribution recentContribution4= new RecentContribution("Total Loan Repayed", today, totalLoanRepaid);
+        RecentContribution recentContribution5= new RecentContribution("Total Social Fund released", today, totalSocialFundReleased);
+        recentContributions.add(recentContribution1);
+        recentContributions.add(recentContribution2);
+        recentContributions.add(recentContribution3);
+        recentContributions.add(recentContribution4);
+        recentContributions.add(recentContribution5);
+        homepageResponse.setTotalAmount(totalSaving+totalSocialFund);
         homepageResponse.setMilestone(milestone());
         homepageResponse.setRecentContributions(recentContributions);
         homepageResponse.setTipOfTheDay(tipOfTheDay());
@@ -39,50 +87,60 @@ public class HomepageService {
 
         return tipOfTheDay;
     }
-
+    double totalSaving2 =0;
     private Milestone milestone() {
-        return new Milestone(2, 2, 1, 0);
-    }
-
-
-    // Ethiopians' first names
-    private static String[] ethiopianFirstNames = {
-            "Faaruu", "Mulu", "Biftu", "Genet", "Malkam",
-            "Caalaa", "Tesfaye", "Sanyii", "Dawit", "Tulluu"
-    };
-
-    // Ethiopians' last names
-    private static String[] ethiopianLastNames = {
-            "Mengistu", "Ejersa", "Girma", "Waariyo", "Tulama"
-    };
-
-    // Method to create a list of 10 instances with random data
-    private List<RecentContribution> createRandomContributions() {
-        List<RecentContribution> contributions = new ArrayList<>();
-        Random random = new Random();
-
-        for (int i = 0; i < 10; i++) {
-            String randomFirstName = ethiopianFirstNames[random.nextInt(ethiopianFirstNames.length)];
-            String randomLastName = ethiopianLastNames[random.nextInt(ethiopianLastNames.length)];
-            String randomContributor = randomFirstName + " " + randomLastName;
-            LocalDate randomDate = LocalDate.now().minusDays(random.nextInt(30));
-            double randomAmount = 50 + (int) (random.nextDouble() * 952);
-            contributions.add(new RecentContribution(randomContributor, randomDate, randomAmount));
+       totalSaving2=0;
+        Users user = loggedInUser.getUser();
+        List<Transaction> transactions=transactionRepository.findTransactionByGroup(user.getGroup());
+        transactions.stream().forEach(t->{
+            if(t.getPaymentType().getPaymentTypeId()==1)
+            {
+                totalSaving2+=t.getAmount();
+            }
+        });
+        int bronze=0;
+        int silver=0;
+        int gold=0;
+        int premium=0;
+        if(totalSaving2<=5000)
+        {
+            bronze=1;
+            silver=0;
+            gold=0;
+            premium=0;
         }
-
-        // Sort the contributions by date in descending order (latest at the top)
-        Collections.sort(contributions, Comparator.comparing(RecentContribution::getDate).reversed());
-        return contributions;
+        if(totalSaving2>5000&&totalSaving2<=7500)
+        {
+            bronze=2;
+            silver=1;
+            gold=0;
+            premium=0;
+        }
+        if(totalSaving2>7500&&totalSaving2<=10000)
+        {
+            bronze=2;
+            silver=2;
+            gold=1;
+            premium=0;
+        }
+        if(totalSaving2>10000&&totalSaving2<=15000)
+        {
+            bronze=2;
+            silver=2;
+            gold=2;
+            premium=1;
+        }
+        if(totalSaving2>15000)
+        {
+            bronze=2;
+            silver=2;
+            gold=2;
+            premium=2;
+        }
+        return new Milestone(bronze, silver, gold, premium);
     }
 
-    // Method to calculate the sum of total amount from a list of contributions
-    private int calculateTotalAmount(List<RecentContribution> contributions) {
-        int totalAmount = 0;
-        for (RecentContribution contribution : contributions)
-            totalAmount += contribution.getAmount();
 
-        return totalAmount;
-    }
 
 }
 
