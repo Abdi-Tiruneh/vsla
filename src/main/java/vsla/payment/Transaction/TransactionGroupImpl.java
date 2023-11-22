@@ -127,4 +127,43 @@ public class TransactionGroupImpl implements TransactionService {
         return transaction;
     }
 
+    @Override
+    public TransactionPage getTransactionByProject(Long projectId) {
+       List<Group> groups=groupRepository.findByProjectProjectId(projectId);
+       roundPaymentAmount = 0.0;
+        loanDespersalAmount = 0.0;
+        loanRepaymnetAmount = 0.0;
+        List<InnerTransactionPage> innerTransactionPages = new ArrayList<InnerTransactionPage>();
+        groups.stream().forEach(g->{
+        List<Transaction> transactions = transactionRepository.findTransactionByGroup(g);
+         transactions.stream().forEach(t -> {
+
+            if (t.getPaymentType().getPaymentTypeId() == 1) {
+                roundPaymentAmount += t.getAmount();
+            }
+            if (t.getPaymentType().getPaymentTypeId() == 2) {
+                loanDespersalAmount += t.getAmount();
+            }
+            if (t.getPaymentType().getPaymentTypeId() == 3) {
+                loanRepaymnetAmount += t.getAmount();
+            }
+
+            InnerTransactionPage innerTransactionPage = new InnerTransactionPage();
+            innerTransactionPage.setName(t.getPayer().getFullName());
+            innerTransactionPage.setGender(t.getPayer().getGender());
+            innerTransactionPage.setAmount(t.getAmount().toString());
+            innerTransactionPage.setStatus(t.getStatus());
+            innerTransactionPages.add(innerTransactionPage);
+        });
+       });
+        TransactionPage transactionPage = new TransactionPage();
+        transactionPage.setAllTransactions(innerTransactionPages);
+        transactionPage.setRoundPayment(roundPaymentAmount.toString());
+        transactionPage.setLoanDespersal(loanDespersalAmount.toString());
+        transactionPage.setLoanRepaymnet(loanRepaymnetAmount.toString());
+        Double total = roundPaymentAmount + loanDespersalAmount + loanRepaymnetAmount;
+        transactionPage.setTotal(total.toString());
+        return transactionPage;
+    }
+
 }

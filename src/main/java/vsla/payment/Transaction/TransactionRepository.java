@@ -12,4 +12,5 @@ public interface TransactionRepository extends JpaRepository<Transaction,Long> {
     List<Transaction> findTransactionByGroup(Group group);
     List<Transaction> findTransactionByPayer(Users payer);
 
+
 }

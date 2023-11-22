@@ -31,6 +31,10 @@ public class TransactionController {
     TransactionPage getTransactions(@PathVariable Long groupId) {
         return transactionService.getTransactionByGroup(groupId);
     }
+    @GetMapping("/getAllTransactionsByProject/{projectId}")
+    TransactionPage getTransactionsByProjectId(@PathVariable Long projectId) {
+        return transactionService.getTransactionByProject(projectId);
+    }
     @GetMapping("/getAllTransactions/socialFund/{groupId}")
     List<InnerTransactionPage> getTransactionssocialFund(@PathVariable Long groupId) {
         return transactionService.getSocialFundTransaction(groupId);

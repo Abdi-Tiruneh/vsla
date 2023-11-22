@@ -7,12 +7,17 @@ import lombok.Data;
 
 @Data
 public class LoanAddRequestDto {
-     @NotBlank(message = "Amount is required")
+    @NotBlank(message = "Amount is required")
     private Double amount;
+
+    @NotBlank(message = "days is required")
+    private int days;
 
     @NotNull(message = "Interest is required")
     private Double interest;
 
     @NotNull(message = "Description is required")
     private String description;
+
+
 }

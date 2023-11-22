@@ -1,9 +1,12 @@
 package vsla.loan;
 
+import java.text.DateFormat;
 import java.text.DecimalFormat;
-import java.time.LocalDate;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -38,7 +41,25 @@ public class LoanServiceImpl implements LoanService {
         List<LoanListDto> loanListDtos = new ArrayList<LoanListDto>();
         loans.stream().forEach(l -> {
             LoanListDto loanListDto = new LoanListDto();
+            loanListDto.setLoanId(l.getLoanId().toString());
             loanListDto.setAmount(l.getAmount().toString());
+            if (l.getStatus().equals("pending")) {
+                loanListDto.setDueDate("-");
+            } else {
+                loanListDto.setDueDate(l.getDueDate());
+
+            }
+            int decimalPlaces = 2;
+
+            // Create a DecimalFormat object with the desired pattern
+            DecimalFormat decimalFormat = new DecimalFormat("#." + "0".repeat(decimalPlaces));
+
+            // Format the double value to a string with the specified number of decimal
+            // places
+            String formatted = decimalFormat.format(l.getAmountToPay());
+            // Parse the formatted string back into a double
+            Double result = Double.parseDouble(formatted);
+            loanListDto.setAmountToBePaid(result.toString());
             loanListDto.setRequester(l.getLoanRequester().getFullName());
             loanListDto.setStatus(l.getStatus());
             loanListDto.setGender(l.getLoanRequester().getGender());
@@ -85,13 +106,13 @@ public class LoanServiceImpl implements LoanService {
         loanPageDto.setPendingPercent(resultPending.toString());
 
         Double repaidPercentage = (repaidAmount * 100) / totalAmount;
-         String formattedRepaid= decimalFormat.format(repaidPercentage);
+        String formattedRepaid = decimalFormat.format(repaidPercentage);
         // Parse the formatted string back into a double
         Double resultRepaid = Double.parseDouble(formattedRepaid);
         loanPageDto.setRepaidPercent(resultRepaid.toString());
 
         Double lostPercentage = (lostAmount * 100) / totalAmount;
-        String formattedLost= decimalFormat.format(lostPercentage);
+        String formattedLost = decimalFormat.format(lostPercentage);
         // Parse the formatted string back into a double
         Double resultLost = Double.parseDouble(formattedLost);
         loanPageDto.setLostPercent(resultLost.toString());
@@ -103,19 +124,40 @@ public class LoanServiceImpl implements LoanService {
 
     @Override
     public Loan addLoan(LoanAddRequestDto tempLoan, Long userId) {
-      Users user = loggedInUser.getUser();
-      Users requester= userRepository.findUsersByUserId(userId);
-      Loan loan= new Loan();
-      loan.setGroup(user.getGroup());
-      loan.setAmount(tempLoan.getAmount());
-      loan.setDescription(tempLoan.getDescription());
-      loan.setInterest(tempLoan.getInterest());
-      loan.setStatus("pending");
-      loan.setLoanRequester(requester);
-      LocalDateTime today = LocalDateTime.now();
-      loan.setCreatedAt(today);
-      loan.setUpdatedAt(today);
-      return loanRepository.save(loan);
+        Users user = loggedInUser.getUser();
+        Users requester = userRepository.findUsersByUserId(userId);
+        Loan loan = new Loan();
+        loan.setGroup(user.getGroup());
+        loan.setAmount(tempLoan.getAmount());
+        loan.setDescription(tempLoan.getDescription());
+        loan.setInterest(tempLoan.getInterest());
+        loan.setStatus("pending");
+        loan.setDays(tempLoan.getDays());
+        loan.setLoanRequester(requester);
+        LocalDateTime today = LocalDateTime.now();
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Date currentDate = new Date();
+        loan.setDueDate(dateFormat.format(currentDate));
+        loan.setCreatedAt(today);
+        loan.setAmountToPay(tempLoan.getAmount() * tempLoan.getInterest() + tempLoan.getAmount());
+        loan.setUpdatedAt(today);
+        return loanRepository.save(loan);
+    }
+
+    @Override
+    public Loan approveLoan(Long loanId) {
+        Loan loan = loanRepository.findByLoanId(loanId);
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Date d = new Date();
+        Calendar c = Calendar.getInstance();
+        c.setTime(d);
+        c.add(Calendar.DATE, loan.getDays());
+        Date dueDate = c.getTime();
+        loan.setDueDate(dateFormat.format(dueDate));
+        LocalDateTime localDateTime = LocalDateTime.now();
+        loan.setUpdatedAt(localDateTime);
+        loan.setStatus("active");
+        return loanRepository.save(loan);
     }
 
 }

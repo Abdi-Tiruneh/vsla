@@ -9,4 +9,5 @@ public class MembersDto {
     private String gender;
     private String proxy;
     private String round;
+    private String maxAmount;
 }

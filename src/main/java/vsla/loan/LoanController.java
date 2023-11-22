@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -31,6 +32,12 @@ public class LoanController {
      public ResponseEntity<SuccessResponse>addLoan(@RequestBody LoanAddRequestDto loan,@PathVariable Long userId) {
      loanService.addLoan(loan,userId);
       SuccessResponse response = new SuccessResponse("loan requested succesfully","success");
+            return new ResponseEntity<SuccessResponse>(response, HttpStatus.OK);
+    }
+    @PutMapping("/edit/{loanId}")
+     public ResponseEntity<SuccessResponse>editLoan(@PathVariable Long loanId) {
+      loanService.approveLoan(loanId);
+      SuccessResponse response = new SuccessResponse("loan approved succesfully","success");
             return new ResponseEntity<SuccessResponse>(response, HttpStatus.OK);
     }
 

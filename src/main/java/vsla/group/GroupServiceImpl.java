@@ -28,6 +28,7 @@ import vsla.userManager.user.dto.UserMapper;
 import vsla.userManager.user.dto.UserResponse;
 import vsla.utils.CurrentlyLoggedInUser;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -229,6 +230,7 @@ public class GroupServiceImpl implements GroupService {
             return UserMapper.toUserResponse(user);
         }
     }
+    Double maxAmount=0.0;
 
     @Override
     @PreAuthorize("hasAuthority('GROUP_ADMIN')")
@@ -238,13 +240,31 @@ public class GroupServiceImpl implements GroupService {
         List<Users> users = userRepository.findByGroupGroupId(groupId);
         users.stream().forEach(u -> {
             if (u.getDeleted() == false) {
+                maxAmount=0.0;
+                List<Transaction> transactions=transactionRepository.findTransactionByPayer(u);
+                transactions.stream().forEach(ts->{
+                    if(ts.getPaymentType().getPaymentTypeId()==1)
+                    {
+                        maxAmount+=ts.getAmount();
+                    }
+                });
+                maxAmount=maxAmount*3;
+                 int decimalPlaces = 2;
+
+            // Create a DecimalFormat object with the desired pattern
+            DecimalFormat decimalFormat = new DecimalFormat("#." + "0".repeat(decimalPlaces));
+
+            // Format the double value to a string with the specified number of decimal
+            // places
+            String formatted = decimalFormat.format(maxAmount);
+            // Parse the formatted string back into a double
+             Double result = Double.parseDouble(formatted);
                 MembersDto member = new MembersDto();
                 member.setUserId(u.getUserId().toString());
                 member.setFullName(u.getFullName());
                 member.setGender(u.getGender());
                 member.setProxy(u.getProxyEnabled().toString());
-                List<Transaction> transactions = transactionRepository.findTransactionByPayer(u);
-
+                member.setMaxAmount(result.toString());
                 Optional<Integer> highestRound = transactions.stream()
                         .filter(t->t.getPaymentType().getPaymentTypeId()==1)
                         .map(Transaction::getRound)

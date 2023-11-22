@@ -2,9 +2,13 @@ package vsla.loan;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Date;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonFormat.Shape;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -33,6 +37,12 @@ public class Loan {
     @Column(name = "interest")
     private Double interest;
 
+    @Column(name = "days")
+    private int days;
+
+    @Column(name = "amount_To_Pay")
+    private Double amountToPay;
+
      @Column(name = "description")
     private String description;
      @ManyToOne
@@ -54,4 +64,8 @@ public class Loan {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @JsonFormat(pattern="yyyy-MM-dd",shape = Shape.STRING)
+    @Column(name = "due_Date")
+    private String dueDate;
 }

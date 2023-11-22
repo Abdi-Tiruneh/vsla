@@ -12,4 +12,5 @@ public interface TransactionService {
     TransactionPage getTransactionByGroup(Long groupId);
     Transaction addTransaction(ContributionDto contributionDto);
     List<InnerTransactionPage> getSocialFundTransaction(Long groupId);
+    TransactionPage getTransactionByProject(Long projectId);
 }
