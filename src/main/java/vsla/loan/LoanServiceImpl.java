@@ -12,6 +12,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
+import vsla.exceptions.customExceptions.BadRequestException;
 import vsla.loan.dto.LoanAddRequestDto;
 import vsla.loan.dto.LoanListDto;
 import vsla.loan.dto.LoanPageDto;
@@ -173,6 +174,38 @@ public class LoanServiceImpl implements LoanService {
         transaction.setGroup(loan.getGroup());
         transaction.setPayer(loan.getGroup().getGroupAdmin());
         PaymentType paymentType= paymentTypeRepository.findByPaymentTypeId(2L);
+        transaction.setPaymentType(paymentType);
+        transactionRepository.save(transaction);
+        return loanRepository.save(loan);
+    }
+
+    @Override
+    public Loan repayLoan(Long loanId) {
+        Transaction transaction= new Transaction();
+        Loan loan = loanRepository.findByLoanId(loanId);
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Date d = new Date();
+        Calendar c = Calendar.getInstance();
+        c.setTime(d);
+        c.add(Calendar.DATE, loan.getDays());
+        Date dueDate = c.getTime();
+        loan.setDueDate(dateFormat.format(dueDate));
+        LocalDateTime localDateTime = LocalDateTime.now();
+        if(loan.getStatus().equals("pending")||loan.getStatus().equals("lost")||loan.getStatus().equals("repaid"))
+        {
+                 throw new BadRequestException("only active loans can be repaid");
+        }
+        loan.setUpdatedAt(localDateTime);
+        loan.setStatus("repaid");
+        transaction.setAmount(loan.getAmountToPay());
+        transaction.setCreatedAt(localDateTime);
+        transaction.setDescription("loan dispersal");
+        transaction.setRound(0);
+        transaction.setStatus("Recieved");
+        transaction.setUpdatedAt(localDateTime);
+        transaction.setGroup(loan.getGroup());
+        transaction.setPayer(loan.getLoanRequester());
+        PaymentType paymentType= paymentTypeRepository.findByPaymentTypeId(3L);
         transaction.setPaymentType(paymentType);
         transactionRepository.save(transaction);
         return loanRepository.save(loan);

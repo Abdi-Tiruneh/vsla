@@ -9,4 +9,5 @@ public interface LoanService {
     LoanPageDto getLoanPageData();
     Loan addLoan(LoanAddRequestDto tempLoan, Long userId);
     Loan approveLoan(Long loanId);
+    Loan repayLoan(Long loanId);
 }

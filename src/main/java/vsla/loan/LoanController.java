@@ -40,5 +40,11 @@ public class LoanController {
       SuccessResponse response = new SuccessResponse("loan approved succesfully","success");
             return new ResponseEntity<SuccessResponse>(response, HttpStatus.OK);
     }
+     @PutMapping("/edit/repay/{loanId}")
+     public ResponseEntity<SuccessResponse>repay(@PathVariable Long loanId) {
+      loanService.repayLoan(loanId);
+      SuccessResponse response = new SuccessResponse("loan repaid succesfully","success");
+            return new ResponseEntity<SuccessResponse>(response, HttpStatus.OK);
+    }
 
 }

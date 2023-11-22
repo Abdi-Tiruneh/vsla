@@ -12,4 +12,6 @@ import lombok.Data;
     private String gender;
     private String status;
     private String amount;
+    private String date;
+
  }

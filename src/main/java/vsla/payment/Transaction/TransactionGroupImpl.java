@@ -1,6 +1,5 @@
 package vsla.payment.Transaction;
 
-import java.sql.Date;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -59,6 +58,7 @@ public class TransactionGroupImpl implements TransactionService {
             InnerTransactionPage innerTransactionPage = new InnerTransactionPage();
             innerTransactionPage.setName(t.getPayer().getFullName());
             innerTransactionPage.setGender(t.getPayer().getGender());
+            innerTransactionPage.setDate(t.getCreatedAt().toString());
             innerTransactionPage.setAmount(t.getAmount().toString());
             innerTransactionPage.setStatus(t.getStatus());
             innerTransactionPages.add(innerTransactionPage);
@@ -82,9 +82,10 @@ public class TransactionGroupImpl implements TransactionService {
         List<InnerTransactionPage> innerTransactionPages = new ArrayList<InnerTransactionPage>();
         transactions.stream().forEach(t -> {
             InnerTransactionPage innerTransactionPage = new InnerTransactionPage();
-            if (t.getPaymentType().getPaymentTypeId() == 4) {
+            if (t.getPaymentType().getPaymentTypeId() == 4||t.getPaymentType().getPaymentTypeId()==5) {
                 innerTransactionPage.setAmount(t.getAmount().toString());
                 innerTransactionPage.setGender(t.getPayer().getGender());
+                innerTransactionPage.setDate(t.getCreatedAt().toString());
                 innerTransactionPage.setName(t.getPayer().getFullName());
                 innerTransactionPage.setStatus(t.getStatus());
                 innerTransactionPages.add(innerTransactionPage);
@@ -117,12 +118,33 @@ public class TransactionGroupImpl implements TransactionService {
         transaction.setAmount(contributionDto.getAmount());
         LocalDateTime currentDateAndTime = LocalDateTime.now();
         transaction.setCreatedAt(currentDateAndTime);
-        transaction.setDescription("round payemnet");
+        if(paymentType.getPaymentTypeId()==4)
+        {
+             transaction.setStatus("Recieved");
+            transaction.setDescription("social fund round payment");
+        }
+        if(paymentType.getPaymentTypeId()==3)
+        {
+             transaction.setStatus("Repaid");
+            transaction.setDescription("loan repayment");
+        }
+        if(paymentType.getPaymentTypeId()==1)
+        {
+             transaction.setDescription("round payemnet");
+              transaction.setStatus("Recieved");
+        }
+        if(paymentType.getPaymentTypeId()==2||paymentType.getPaymentTypeId()==5)
+        {
+             transaction.setStatus("Disbursed");
+            transaction.setDescription(contributionDto.getDescription());
+        }
+
+       
         transaction.setGroup(group);
         transaction.setPayer(payer);
         transaction.setPaymentType(paymentType);
         transaction.setRound(contributionDto.getRound());
-        transaction.setStatus("Recieved");
+       
         transactionRepository.save(transaction);
         return transaction;
     }
@@ -152,6 +174,7 @@ public class TransactionGroupImpl implements TransactionService {
             innerTransactionPage.setName(t.getPayer().getFullName());
             innerTransactionPage.setGender(t.getPayer().getGender());
             innerTransactionPage.setAmount(t.getAmount().toString());
+            innerTransactionPage.setDate(t.getCreatedAt().toString());
             innerTransactionPage.setStatus(t.getStatus());
             innerTransactionPages.add(innerTransactionPage);
         });
