@@ -15,6 +15,10 @@ import lombok.RequiredArgsConstructor;
 import vsla.loan.dto.LoanAddRequestDto;
 import vsla.loan.dto.LoanListDto;
 import vsla.loan.dto.LoanPageDto;
+import vsla.payment.Transaction.Transaction;
+import vsla.payment.Transaction.TransactionRepository;
+import vsla.payment.paymentType.PaymentType;
+import vsla.payment.paymentType.PaymentTypeRepository;
 import vsla.userManager.user.UserRepository;
 import vsla.userManager.user.Users;
 import vsla.utils.CurrentlyLoggedInUser;
@@ -25,6 +29,8 @@ public class LoanServiceImpl implements LoanService {
     private final CurrentlyLoggedInUser loggedInUser;
     private final LoanRepository loanRepository;
     private final UserRepository userRepository;
+    private final PaymentTypeRepository paymentTypeRepository;
+    private final TransactionRepository transactionRepository;
     Double pendingAmount = 0.0;
     Double activeAmount = 0.0;
     Double repaidAmount = 0.0;
@@ -146,6 +152,7 @@ public class LoanServiceImpl implements LoanService {
 
     @Override
     public Loan approveLoan(Long loanId) {
+        Transaction transaction= new Transaction();
         Loan loan = loanRepository.findByLoanId(loanId);
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         Date d = new Date();
@@ -157,6 +164,17 @@ public class LoanServiceImpl implements LoanService {
         LocalDateTime localDateTime = LocalDateTime.now();
         loan.setUpdatedAt(localDateTime);
         loan.setStatus("active");
+        transaction.setAmount(loan.getAmount());
+        transaction.setCreatedAt(localDateTime);
+        transaction.setDescription("loan dispersal");
+        transaction.setRound(0);
+        transaction.setStatus("Recieved");
+        transaction.setUpdatedAt(localDateTime);
+        transaction.setGroup(loan.getGroup());
+        transaction.setPayer(loan.getGroup().getGroupAdmin());
+        PaymentType paymentType= paymentTypeRepository.findByPaymentTypeId(2L);
+        transaction.setPaymentType(paymentType);
+        transactionRepository.save(transaction);
         return loanRepository.save(loan);
     }
 
