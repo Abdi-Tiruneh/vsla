@@ -15,7 +15,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.stereotype.Component;
 import vsla.security.service.JwtTokenUtil;
-import vsla.userManager.user.Users;
 
 import java.io.IOException;
 import java.util.HashMap;

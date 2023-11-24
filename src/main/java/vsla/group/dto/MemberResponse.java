@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Data;
 import vsla.group.Group;
-import vsla.payment.Transaction.TransactionRepository;
 import vsla.userManager.user.Users;
 
 import java.text.DecimalFormat;
