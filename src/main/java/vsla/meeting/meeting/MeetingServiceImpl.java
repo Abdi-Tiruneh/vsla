@@ -37,6 +37,9 @@ public class MeetingServiceImpl implements MeetingService {
 
     @Override
     public Meeting createMeeting(Meeting meeting) {
+        LocalDateTime localDateTime= LocalDateTime.now();
+        meeting.setCreatedAt(localDateTime);
+        meeting.setUpdatedAt(localDateTime);
         meeting.setIsEnabled(true);
         return meetingRepository.save(meeting);
     }

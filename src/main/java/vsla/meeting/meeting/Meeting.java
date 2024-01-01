@@ -5,7 +5,6 @@ import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import vsla.group.Group;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
