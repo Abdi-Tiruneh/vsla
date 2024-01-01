@@ -2,104 +2,76 @@ package vsla.meeting.meeting;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import vsla.exceptions.customExceptions.ResourceAlreadyExistsException;
-import vsla.exceptions.customExceptions.ResourceNotFoundException;
-import vsla.group.Group;
-import vsla.group.GroupRepository;
-import vsla.meeting.meeting.dto.MeetingMapper;
-import vsla.meeting.meeting.dto.MeetingReq;
-import vsla.meeting.meeting.dto.MeetingResponse;
-import vsla.meeting.meetingInterval.MeetingInterval;
-import vsla.meeting.meetingInterval.MeetingIntervalService;
-import vsla.meeting.meetingType.MeetingType;
-import vsla.meeting.meetingType.MeetingTypeService;
-
-import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class MeetingServiceImpl implements MeetingService {
     private final MeetingRepository meetingRepository;
-    private final MeetingTypeService meetingTypeService;
-    private final MeetingIntervalService meetingIntervalService;
-    private final GroupRepository groupRepository;
 
     @Override
-    public MeetingResponse createMeeting(MeetingReq meetingReq) {
-        // Fetch necessary entities
-        Group group = getGroupById(meetingReq.getGroupId());
-        MeetingType meetingType = meetingTypeService.getMeetingTypeById(meetingReq.getMeetingTypeId());
-        MeetingInterval meetingInterval = meetingIntervalService.getMeetingIntervalById(meetingReq.getMeetingIntervalId());
-
-        // Check if a meeting of the same type already exists for the group
-        List<Meeting> meetings = meetingRepository.findByGroupGroupId(meetingReq.getGroupId());
-        for (Meeting meeting : meetings) {
-            if (meeting.getMeetingType().equals(meetingType))
-                throw new ResourceAlreadyExistsException("A meeting of type '" + meetingType.getMeetingTypeName() + "' already exists for your group.");
-        }
-
-        // Create a new meeting
-        Meeting newMeeting = new Meeting();
-        newMeeting.setMeetingInterval(meetingInterval);
-        newMeeting.setMeetingType(meetingType);
-        newMeeting.setGroup(group);
-        newMeeting.setNextMeetingDate(meetingReq.getMeetingDate());
-
-        newMeeting = meetingRepository.save(newMeeting);
-
-        return MeetingMapper.toResponse(newMeeting);
+    public Meeting EditMeeting(Long meetingId, Meeting meeting) {
+       LocalDateTime localDateTime=  LocalDateTime.now();
+       Meeting meetingToBeUpdated= meetingRepository.findMeetingByMeetingId(meetingId);
+       meetingToBeUpdated.setCurrentRound(meeting.getCurrentRound());
+       meetingToBeUpdated.setIsEnabled(meeting.getIsEnabled());
+       meetingToBeUpdated.setGroup(meeting.getGroup());
+       meetingToBeUpdated.setMeetingInterval(meeting.getMeetingInterval());
+       meetingToBeUpdated.setMeetingReason(meeting.getMeetingReason());
+       meetingToBeUpdated.setMeetingType(meeting.getMeetingType());
+       meetingToBeUpdated.setIntervalDays(meeting.getIntervalDays());
+       meetingToBeUpdated.setNextMeetingDate(meeting.getNextMeetingDate());
+       meetingToBeUpdated.setCreatedAt(meetingToBeUpdated.getCreatedAt());
+       meetingToBeUpdated.setUpdatedAt(localDateTime);
+       return meetingRepository.save(meetingToBeUpdated);
     }
 
     @Override
-    public void createDefaultMeeting(Group group, Long meetingIntervalId, LocalDate meetingDate) {
-        // Fetch necessary entities
-        MeetingType meetingType = meetingTypeService.getByMeetingTypeName("Round Payment");
-        MeetingInterval meetingInterval = meetingIntervalService.getMeetingIntervalById(meetingIntervalId);
-
-        // Create a new meeting
-        Meeting newMeeting = new Meeting();
-        newMeeting.setMeetingInterval(meetingInterval);
-        newMeeting.setMeetingType(meetingType);
-        newMeeting.setGroup(group);
-        newMeeting.setNextMeetingDate(meetingDate);
-
-        meetingRepository.save(newMeeting);
+    public Meeting CancleMeeting(Long meetingId) {
+        Meeting meeting= meetingRepository.findMeetingByMeetingId(meetingId);
+        meeting.setIsEnabled(false);
+        return meetingRepository.save(meeting);
     }
 
     @Override
-    public MeetingResponse updateMeetingRound(Long meetingId) {
-        Meeting meeting = getMeetingById(meetingId);
-
-        // Calculate the updated round and next meeting date
-        int updatedRound = meeting.getCurrentRound() + 1;
-        LocalDate nextMeetingDate = LocalDate.now().plusDays(meeting.getMeetingInterval().getIntervalInDays());
-
-        // Update the meeting details
-        meeting.setCurrentRound(updatedRound);
-        meeting.setNextMeetingDate(nextMeetingDate);
-
-        meeting = meetingRepository.save(meeting);
-
-        return MeetingMapper.toResponse(meeting);
+    public Meeting createMeeting(Meeting meeting) {
+        meeting.setIsEnabled(true);
+        return meetingRepository.save(meeting);
     }
 
     @Override
-    public List<MeetingResponse> getAllMeetingsByGroup(Long groupId) {
-        List<Meeting> meetings = meetingRepository.findByGroupGroupId(groupId);
-        return meetings.stream()
-                .map(MeetingMapper::toResponse)
-                .toList();
+    public List<Meeting> getAllMeetingsByGroup(Long groupId) {
+       return meetingRepository.findByGroupGroupId(groupId);
     }
 
     @Override
     public Meeting getMeetingById(Long meetingId) {
-        return meetingRepository.findById(meetingId)
-                .orElseThrow(() -> new ResourceNotFoundException("Meeting with ID " + meetingId + " not found."));
+        return meetingRepository.findMeetingByMeetingId(meetingId);
     }
 
-    private Group getGroupById(Long groupId) {
-        return groupRepository.findById(groupId)
-                .orElseThrow(() -> new ResourceNotFoundException("Group not found"));
+    @Override
+    public Meeting ContinueMeeting(Long meetingId, int nextRound) {
+        Meeting meeting= meetingRepository.findMeetingByMeetingId(meetingId);
+        //  LocalDateTime updatedDate = currentDate.plus(3, ChronoUnit.DAYS);
+        LocalDateTime updatedDate=meeting.getNextMeetingDate().plus(meeting.getIntervalDays(), ChronoUnit.DAYS);
+        meeting.setNextMeetingDate(updatedDate);
+        meeting.setIsEnabled(true);
+        meeting.setCurrentRound(nextRound);
+       return meetingRepository.save(meeting);
     }
+
+    @Override
+    public List<Meeting> getActiveMeetingsByGroup(Long groupId) {
+        return meetingRepository.findMeetingByGroupGroupIdAndIsEnabled(groupId, true);
+    }
+
+    @Override
+    public List<Meeting> getInActiveMeetingsByGroup(Long groupId) {
+        return meetingRepository.findMeetingByGroupGroupIdAndIsEnabled(groupId, false);
+    }
+    
+
+   
 }

@@ -1,20 +1,22 @@
 package vsla.meeting.meeting;
 
-import vsla.group.Group;
-import vsla.meeting.meeting.dto.MeetingReq;
-import vsla.meeting.meeting.dto.MeetingResponse;
-
-import java.time.LocalDate;
 import java.util.List;
 
 public interface MeetingService {
-    MeetingResponse createMeeting(MeetingReq meetingReq);
+    Meeting ContinueMeeting(Long meetingId, int nextRound);
 
-    void createDefaultMeeting(Group group, Long meetingIntervalId, LocalDate meetingDate);
+    Meeting EditMeeting(Long meetingId,Meeting meeting);
 
-    MeetingResponse updateMeetingRound(Long meetingId);
+    Meeting CancleMeeting(Long meetingId);
 
-    List<MeetingResponse> getAllMeetingsByGroup(Long groupId);
+    Meeting createMeeting(Meeting meeting);
 
-    Meeting getMeetingById(Long meetingId);
+    List<Meeting> getAllMeetingsByGroup(Long groupId);
+
+    List<Meeting> getActiveMeetingsByGroup(Long groupId);
+
+    List<Meeting> getInActiveMeetingsByGroup(Long groupId);
+
+     Meeting getMeetingById(Long meetingId);
+
 }

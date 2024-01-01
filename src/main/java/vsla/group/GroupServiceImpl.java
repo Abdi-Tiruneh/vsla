@@ -86,8 +86,8 @@ public class GroupServiceImpl implements GroupService {
         // Update the user's group membership
         updateUser(loggedInUser, group);
 
-        // create default meeting for the group
-        meetingService.createDefaultMeeting(group, groupReq.getMeetingIntervalId(), groupReq.getMeetingDate());
+        // // create default meeting for the group
+        // meetingService.createDefaultMeeting(group, groupReq.getMeetingIntervalId(), groupReq.getMeetingDate());
 
         return GroupResponse.toGroupResponse(group);
     }

@@ -7,6 +7,7 @@ import java.util.List;
 
 @Repository
 public interface MeetingRepository extends JpaRepository<Meeting, Long> {
-
     List<Meeting> findByGroupGroupId(Long groupId);
+    Meeting findMeetingByMeetingId(Long meetingId);
+    List<Meeting> findMeetingByGroupGroupIdAndIsEnabled(Long groupId,Boolean isEnabled);
 }

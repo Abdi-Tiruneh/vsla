@@ -5,9 +5,6 @@ import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import vsla.group.Group;
-import vsla.meeting.meetingInterval.MeetingInterval;
-import vsla.meeting.meetingType.MeetingType;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -24,15 +21,19 @@ public class Meeting {
     private int currentRound;
 
     @Column(name = "meeting_date")
-    private LocalDate nextMeetingDate;
+    private LocalDateTime nextMeetingDate;
 
-    @ManyToOne
-    @JoinColumn(name = "meeting_interval_id", nullable = false)
-    private MeetingInterval meetingInterval;
+    @Column(name = "meeting_interval")
+    private String meetingInterval;
 
-    @ManyToOne
-    @JoinColumn(name = "meeting_type_id", nullable = false)
-    private MeetingType meetingType;
+    @Column(name = "interval_Days")
+    private Integer intervalDays;
+
+    @Column(name = "meeting_type")
+    private String meetingType;
+
+    @Column(name = "meeting_reseaon")
+    private String meetingReason;
 
     @ManyToOne
     @JoinColumn(name = "group_id", nullable = false)
@@ -45,4 +46,8 @@ public class Meeting {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+    
+    @Column(name = "is_enabled")
+    private Boolean isEnabled;
+
 }
