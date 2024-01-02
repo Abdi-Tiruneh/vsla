@@ -2,6 +2,8 @@ package vsla.meeting.meeting;
 
 import java.util.List;
 
+import vsla.meeting.meeting.dto.MeetingDTO;
+
 public interface MeetingService {
     Meeting ContinueMeeting(Long meetingId, int nextRound);
 
@@ -11,12 +13,12 @@ public interface MeetingService {
 
     Meeting createMeeting(Meeting meeting);
 
-    List<Meeting> getAllMeetingsByGroup(Long groupId);
+    List<MeetingDTO> getAllMeetingsByGroup(Long groupId);
 
-    List<Meeting> getActiveMeetingsByGroup(Long groupId);
+    List<MeetingDTO> getActiveMeetingsByGroup(Long groupId);
 
-    List<Meeting> getInActiveMeetingsByGroup(Long groupId);
+   List<MeetingDTO> getInActiveMeetingsByGroup(Long groupId);
 
-     Meeting getMeetingById(Long meetingId);
+   MeetingDTO getMeetingById(Long meetingId);
 
 }

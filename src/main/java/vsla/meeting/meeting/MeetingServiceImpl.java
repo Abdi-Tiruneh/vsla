@@ -1,9 +1,12 @@
 package vsla.meeting.meeting;
 
 import lombok.RequiredArgsConstructor;
+import vsla.meeting.meeting.dto.MeetingDTO;
+
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -13,31 +16,30 @@ public class MeetingServiceImpl implements MeetingService {
 
     @Override
     public Meeting EditMeeting(Long meetingId, Meeting meeting) {
-       LocalDateTime localDateTime=  LocalDateTime.now();
-       Meeting meetingToBeUpdated= meetingRepository.findMeetingByMeetingId(meetingId);
-       meetingToBeUpdated.setCurrentRound(meeting.getCurrentRound());
-       meetingToBeUpdated.setIsEnabled(meeting.getIsEnabled());
-       meetingToBeUpdated.setGroup(meeting.getGroup());
-       meetingToBeUpdated.setMeetingInterval(meeting.getMeetingInterval());
-       meetingToBeUpdated.setMeetingReason(meeting.getMeetingReason());
-       meetingToBeUpdated.setMeetingType(meeting.getMeetingType());
-       meetingToBeUpdated.setIntervalDays(meeting.getIntervalDays());
-       meetingToBeUpdated.setNextMeetingDate(meeting.getNextMeetingDate());
-       meetingToBeUpdated.setCreatedAt(meetingToBeUpdated.getCreatedAt());
-       meetingToBeUpdated.setUpdatedAt(localDateTime);
-       return meetingRepository.save(meetingToBeUpdated);
+        LocalDateTime localDateTime = LocalDateTime.now();
+        Meeting meetingToBeUpdated = meetingRepository.findMeetingByMeetingId(meetingId);
+        meetingToBeUpdated.setCurrentRound(meeting.getCurrentRound());
+        meetingToBeUpdated.setIsEnabled(meeting.getIsEnabled());
+        meetingToBeUpdated.setMeetingInterval(meeting.getMeetingInterval());
+        meetingToBeUpdated.setMeetingReason(meeting.getMeetingReason());
+        meetingToBeUpdated.setMeetingType(meeting.getMeetingType());
+        meetingToBeUpdated.setIntervalDays(meeting.getIntervalDays());
+        meetingToBeUpdated.setNextMeetingDate(meeting.getNextMeetingDate());
+        meetingToBeUpdated.setCreatedAt(meetingToBeUpdated.getCreatedAt());
+        meetingToBeUpdated.setUpdatedAt(localDateTime);
+        return meetingRepository.save(meetingToBeUpdated);
     }
 
     @Override
     public Meeting CancleMeeting(Long meetingId) {
-        Meeting meeting= meetingRepository.findMeetingByMeetingId(meetingId);
+        Meeting meeting = meetingRepository.findMeetingByMeetingId(meetingId);
         meeting.setIsEnabled(false);
         return meetingRepository.save(meeting);
     }
 
     @Override
     public Meeting createMeeting(Meeting meeting) {
-        LocalDateTime localDateTime= LocalDateTime.now();
+        LocalDateTime localDateTime = LocalDateTime.now();
         meeting.setCreatedAt(localDateTime);
         meeting.setUpdatedAt(localDateTime);
         meeting.setIsEnabled(true);
@@ -45,36 +47,83 @@ public class MeetingServiceImpl implements MeetingService {
     }
 
     @Override
-    public List<Meeting> getAllMeetingsByGroup(Long groupId) {
-       return meetingRepository.findByGroupGroupId(groupId);
+    public List<MeetingDTO> getAllMeetingsByGroup(Long groupId) {
+        List<MeetingDTO> meetingDTOs = new ArrayList<MeetingDTO>();
+        List<Meeting> meetings = meetingRepository.findByGroupGroupId(groupId);
+        meetings.stream().forEach(m -> {
+            MeetingDTO meetingDTO = new MeetingDTO();
+            meetingDTO.setMeetingId(m.getMeetingId().toString());
+            meetingDTO.setCurrentRound(String.valueOf(m.getCurrentRound()));
+            meetingDTO.setIntervalDays(String.valueOf(m.getIntervalDays()));
+            meetingDTO.setMeetingInterval(m.getMeetingInterval());
+            meetingDTO.setMeetingReason(m.getMeetingReason());
+            meetingDTO.setNextMeetingDate(m.getNextMeetingDate().toString());
+            meetingDTO.setMeetingType(m.getMeetingType());
+            meetingDTOs.add(meetingDTO);
+        });
+        return meetingDTOs;
     }
 
     @Override
-    public Meeting getMeetingById(Long meetingId) {
-        return meetingRepository.findMeetingByMeetingId(meetingId);
+    public MeetingDTO getMeetingById(Long meetingId) {
+        Meeting meeting = meetingRepository.findMeetingByMeetingId(meetingId);
+
+            MeetingDTO meetingDTO = new MeetingDTO();
+            meetingDTO.setMeetingId(meeting.getMeetingId().toString());
+            meetingDTO.setCurrentRound(String.valueOf(meeting.getCurrentRound()));
+            meetingDTO.setIntervalDays(String.valueOf(meeting.getIntervalDays()));
+            meetingDTO.setMeetingInterval(meeting.getMeetingInterval());
+            meetingDTO.setMeetingReason(meeting.getMeetingReason());
+            meetingDTO.setNextMeetingDate(meeting.getNextMeetingDate().toString());
+            meetingDTO.setMeetingType(meeting.getMeetingType());
+        return meetingDTO;
     }
 
     @Override
     public Meeting ContinueMeeting(Long meetingId, int nextRound) {
-        Meeting meeting= meetingRepository.findMeetingByMeetingId(meetingId);
-        //  LocalDateTime updatedDate = currentDate.plus(3, ChronoUnit.DAYS);
-        LocalDateTime updatedDate=meeting.getNextMeetingDate().plus(meeting.getIntervalDays(), ChronoUnit.DAYS);
+        Meeting meeting = meetingRepository.findMeetingByMeetingId(meetingId);
+        // LocalDateTime updatedDate = currentDate.plus(3, ChronoUnit.DAYS);
+        LocalDateTime updatedDate = meeting.getNextMeetingDate().plus(meeting.getIntervalDays(), ChronoUnit.DAYS);
         meeting.setNextMeetingDate(updatedDate);
         meeting.setIsEnabled(true);
         meeting.setCurrentRound(nextRound);
-       return meetingRepository.save(meeting);
+        return meetingRepository.save(meeting);
     }
 
     @Override
-    public List<Meeting> getActiveMeetingsByGroup(Long groupId) {
-        return meetingRepository.findMeetingByGroupGroupIdAndIsEnabled(groupId, true);
+    public List<MeetingDTO> getActiveMeetingsByGroup(Long groupId) {
+        List<MeetingDTO> meetingDTOs = new ArrayList<MeetingDTO>();
+        List<Meeting> meetings = meetingRepository.findMeetingByGroupGroupIdAndIsEnabled(groupId, true);
+        meetings.stream().forEach(m -> {
+            MeetingDTO meetingDTO = new MeetingDTO();
+            meetingDTO.setMeetingId(m.getMeetingId().toString());
+            meetingDTO.setCurrentRound(String.valueOf(m.getCurrentRound()));
+            meetingDTO.setIntervalDays(String.valueOf(m.getIntervalDays()));
+            meetingDTO.setMeetingInterval(m.getMeetingInterval());
+            meetingDTO.setMeetingReason(m.getMeetingReason());
+            meetingDTO.setNextMeetingDate(m.getNextMeetingDate().toString());
+            meetingDTO.setMeetingType(m.getMeetingType());
+            meetingDTOs.add(meetingDTO);
+        });
+        return meetingDTOs;
     }
 
     @Override
-    public List<Meeting> getInActiveMeetingsByGroup(Long groupId) {
-        return meetingRepository.findMeetingByGroupGroupIdAndIsEnabled(groupId, false);
+    public List<MeetingDTO> getInActiveMeetingsByGroup(Long groupId) {
+        List<MeetingDTO> meetingDTOs = new ArrayList<MeetingDTO>();
+        List<Meeting> meetings = meetingRepository.findMeetingByGroupGroupIdAndIsEnabled(groupId, false);
+        meetings.stream().forEach(m -> {
+            MeetingDTO meetingDTO = new MeetingDTO();
+            meetingDTO.setMeetingId(m.getMeetingId().toString());
+            meetingDTO.setCurrentRound(String.valueOf(m.getCurrentRound()));
+            meetingDTO.setIntervalDays(String.valueOf(m.getIntervalDays()));
+            meetingDTO.setMeetingInterval(m.getMeetingInterval());
+            meetingDTO.setMeetingReason(m.getMeetingReason());
+            meetingDTO.setNextMeetingDate(m.getNextMeetingDate().toString());
+            meetingDTO.setMeetingType(m.getMeetingType());
+            meetingDTOs.add(meetingDTO);
+        });
+        return meetingDTOs;
     }
-    
 
-   
 }
