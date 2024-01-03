@@ -49,7 +49,7 @@ public class JwtTokenUtil {
                 .withClaim("role", role)
                 .withClaim("has-group", hasGroup)
                 .withClaim("groupId", groupId)
-                .withClaim("orgId", orgId)
+                .withClaim("org_id", orgId)
                 .withIssuer("Vsla App")
                 .sign(Algorithm.HMAC256(SECRET_KEY.getBytes()));
     }

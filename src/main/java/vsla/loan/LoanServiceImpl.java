@@ -211,4 +211,99 @@ public class LoanServiceImpl implements LoanService {
         return loanRepository.save(loan);
     }
 
+    @Override
+    public LoanPageDto getLoanPageDataForAdmin() {
+        pendingAmount = 0.0;
+        activeAmount = 0.0;
+        repaidAmount = 0.0;
+        lostAmount = 0.0;
+       // Users user = loggedInUser.getUser();
+        List<Loan> loans = loanRepository.findAll();
+        List<LoanListDto> loanListDtos = new ArrayList<LoanListDto>();
+        loans.stream().forEach(l -> {
+            // if(l.getGroup().getOrganization().getOrganizationId().compareTo(user.getOrganization().getOrganizationId())==0)
+            // {
+                 LoanListDto loanListDto = new LoanListDto();
+            loanListDto.setLoanId(l.getLoanId().toString());
+            loanListDto.setAmount(l.getAmount().toString());
+            if (l.getStatus().equals("pending")) {
+                loanListDto.setDueDate("-");
+            } else {
+                loanListDto.setDueDate(l.getDueDate());
+
+            }
+            int decimalPlaces = 2;
+
+            // Create a DecimalFormat object with the desired pattern
+            DecimalFormat decimalFormat = new DecimalFormat("#." + "0".repeat(decimalPlaces));
+
+            // Format the double value to a string with the specified number of decimal
+            // places
+            String formatted = decimalFormat.format(l.getAmountToPay());
+            // Parse the formatted string back into a double
+            Double result = Double.parseDouble(formatted);
+            loanListDto.setAmountToBePaid(result.toString());
+            loanListDto.setRequester(l.getLoanRequester().getFullName());
+            loanListDto.setStatus(l.getStatus());
+            loanListDto.setGender(l.getLoanRequester().getGender());
+            loanListDto.setUpdatedDate(l.getUpdatedAt().toString());
+            if (l.getStatus().equals("pending")) {
+                pendingAmount += l.getAmount();
+            }
+            if (l.getStatus().equals("active")) {
+                activeAmount += l.getAmount();
+            }
+            if (l.getStatus().equals("repaid")) {
+                repaidAmount += l.getAmount();
+            }
+            if (l.getStatus().equals("lost")) {
+                lostAmount = +l.getAmount();
+            }
+            loanListDtos.add(loanListDto);
+            // }
+        });
+        LoanPageDto loanPageDto = new LoanPageDto();
+        loanPageDto.setActiveValue(activeAmount.toString());
+        loanPageDto.setPendingValue(pendingAmount.toString());
+        loanPageDto.setRepaidValue(repaidAmount.toString());
+        loanPageDto.setLostValue(lostAmount.toString());
+        Double totalAmount = activeAmount + pendingAmount + repaidAmount + lostAmount;
+        loanPageDto.setTotalValue(totalAmount.toString());
+
+        Double activePercentage = (activeAmount * 100) / totalAmount;
+        int decimalPlaces = 2;
+
+        // Create a DecimalFormat object with the desired pattern
+        DecimalFormat decimalFormat = new DecimalFormat("#." + "0".repeat(decimalPlaces));
+
+        // Format the double value to a string with the specified number of decimal
+        // places
+        String formattedActive = decimalFormat.format(activePercentage);
+        // Parse the formatted string back into a double
+        Double resultActive = Double.parseDouble(formattedActive);
+        loanPageDto.setActivePercent(resultActive.toString());
+
+        Double pendingPercentage = (pendingAmount * 100) / totalAmount;
+        String formattedPending = decimalFormat.format(pendingPercentage);
+        // Parse the formatted string back into a double
+        Double resultPending = Double.parseDouble(formattedPending);
+        loanPageDto.setPendingPercent(resultPending.toString());
+
+        Double repaidPercentage = (repaidAmount * 100) / totalAmount;
+        String formattedRepaid = decimalFormat.format(repaidPercentage);
+        // Parse the formatted string back into a double
+        Double resultRepaid = Double.parseDouble(formattedRepaid);
+        loanPageDto.setRepaidPercent(resultRepaid.toString());
+
+        Double lostPercentage = (lostAmount * 100) / totalAmount;
+        String formattedLost = decimalFormat.format(lostPercentage);
+        // Parse the formatted string back into a double
+        Double resultLost = Double.parseDouble(formattedLost);
+        loanPageDto.setLostPercent(resultLost.toString());
+
+        loanPageDto.setLoanListDtos(loanListDtos);
+        return loanPageDto;
+
+    }
+
 }

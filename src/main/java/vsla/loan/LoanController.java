@@ -25,7 +25,13 @@ public class LoanController {
 
     @GetMapping("/LoanPage")
     LoanPageDto getLoanPageData() {
+        
         return loanService.getLoanPageData();
+    }
+     @GetMapping("/AdminLoanPage")
+    LoanPageDto getLoanPageDataForAdmin() {
+        
+        return loanService.getLoanPageDataForAdmin();
     }
 
     @PostMapping("/Add/{userId}")
