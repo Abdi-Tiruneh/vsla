@@ -45,7 +45,6 @@ public class GroupServiceImpl implements GroupService {
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final UserService userService;
-    private final MeetingService meetingService;
     private final TransactionRepository transactionRepository;
 
 

@@ -3,6 +3,8 @@ package vsla.meeting.meeting;
 import lombok.RequiredArgsConstructor;
 import vsla.meeting.meeting.dto.MeetingDTO;
 import vsla.meeting.meeting.dto.MeetingDTO2;
+import vsla.userManager.user.Users;
+import vsla.utils.CurrentlyLoggedInUser;
 
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
@@ -14,6 +16,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MeetingServiceImpl implements MeetingService {
     private final MeetingRepository meetingRepository;
+    private final CurrentlyLoggedInUser currentlyLoggedInUser;
 
     @Override
     public Meeting EditMeeting(Long meetingId, Meeting meeting) {
@@ -129,9 +132,12 @@ public class MeetingServiceImpl implements MeetingService {
 
     @Override
     public List<MeetingDTO2> getAllMeetings() {
+        Users user = currentlyLoggedInUser.getUser();
         List<MeetingDTO2> meetingDTOs = new ArrayList<MeetingDTO2>();
         List<Meeting> meetings = meetingRepository.findAll();
         meetings.stream().forEach(m -> {
+            if(user.getOrganization().getOrganizationId().compareTo(m.getGroup().getOrganization().getOrganizationId())==0)
+            {
             MeetingDTO2 meetingDTO = new MeetingDTO2();
             meetingDTO.setMeetingId(m.getMeetingId().toString());
             meetingDTO.setCurrentRound(String.valueOf(m.getCurrentRound()));
@@ -142,6 +148,7 @@ public class MeetingServiceImpl implements MeetingService {
             meetingDTO.setMeetingType(m.getMeetingType());
             meetingDTO.setGroupId(m.getGroup().getGroupId().toString());
             meetingDTOs.add(meetingDTO);
+            }
         });
         return meetingDTOs;
     }
