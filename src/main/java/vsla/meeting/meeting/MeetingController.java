@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
 import vsla.meeting.meeting.dto.MeetingDTO;
+import vsla.meeting.meeting.dto.MeetingDTO2;
 import vsla.payment.Transaction.dto.SuccessResponse;
 
 @RequiredArgsConstructor
@@ -23,6 +24,10 @@ import vsla.payment.Transaction.dto.SuccessResponse;
 public class MeetingController {
     @Autowired
     private final MeetingService meetingService;
+    @GetMapping("/getAllMeetings")
+    List<MeetingDTO2> getAllMeetings() {
+        return meetingService.getAllMeetings();
+    }
     @GetMapping("/getAllMeetings/{groupId}")
     List<MeetingDTO> getAllMeetings(@PathVariable Long groupId) {
         return meetingService.getAllMeetingsByGroup(groupId);

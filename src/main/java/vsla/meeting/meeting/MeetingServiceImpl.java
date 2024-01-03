@@ -2,6 +2,7 @@ package vsla.meeting.meeting;
 
 import lombok.RequiredArgsConstructor;
 import vsla.meeting.meeting.dto.MeetingDTO;
+import vsla.meeting.meeting.dto.MeetingDTO2;
 
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
@@ -121,6 +122,25 @@ public class MeetingServiceImpl implements MeetingService {
             meetingDTO.setMeetingReason(m.getMeetingReason());
             meetingDTO.setNextMeetingDate(m.getNextMeetingDate().toString());
             meetingDTO.setMeetingType(m.getMeetingType());
+            meetingDTOs.add(meetingDTO);
+        });
+        return meetingDTOs;
+    }
+
+    @Override
+    public List<MeetingDTO2> getAllMeetings() {
+        List<MeetingDTO2> meetingDTOs = new ArrayList<MeetingDTO2>();
+        List<Meeting> meetings = meetingRepository.findAll();
+        meetings.stream().forEach(m -> {
+            MeetingDTO2 meetingDTO = new MeetingDTO2();
+            meetingDTO.setMeetingId(m.getMeetingId().toString());
+            meetingDTO.setCurrentRound(String.valueOf(m.getCurrentRound()));
+            meetingDTO.setIntervalDays(String.valueOf(m.getIntervalDays()));
+            meetingDTO.setMeetingInterval(m.getMeetingInterval());
+            meetingDTO.setMeetingReason(m.getMeetingReason());
+            meetingDTO.setNextMeetingDate(m.getNextMeetingDate().toString());
+            meetingDTO.setMeetingType(m.getMeetingType());
+            meetingDTO.setGroupId(m.getGroup().getGroupId().toString());
             meetingDTOs.add(meetingDTO);
         });
         return meetingDTOs;
