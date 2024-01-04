@@ -131,13 +131,12 @@ public class MeetingServiceImpl implements MeetingService {
     }
 
     @Override
-    public List<MeetingDTO2> getAllMeetings() {
-       // Users user = currentlyLoggedInUser.getUser();
+    public List<MeetingDTO2> getAllMeetings(Long organizationId) {
         List<MeetingDTO2> meetingDTOs = new ArrayList<MeetingDTO2>();
         List<Meeting> meetings = meetingRepository.findAll();
         meetings.stream().forEach(m -> {
-            // if(user.getOrganization().getOrganizationId().compareTo(m.getGroup().getOrganization().getOrganizationId())==0)
-            // {
+            if(organizationId.compareTo(m.getGroup().getOrganization().getOrganizationId())==0)
+            {
             MeetingDTO2 meetingDTO = new MeetingDTO2();
             meetingDTO.setMeetingId(m.getMeetingId().toString());
             meetingDTO.setCurrentRound(String.valueOf(m.getCurrentRound()));
@@ -148,7 +147,7 @@ public class MeetingServiceImpl implements MeetingService {
             meetingDTO.setMeetingType(m.getMeetingType());
             meetingDTO.setGroupId(m.getGroup().getGroupId().toString());
             meetingDTOs.add(meetingDTO);
-           // }
+           }
         });
         return meetingDTOs;
     }

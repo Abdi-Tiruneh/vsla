@@ -24,9 +24,9 @@ import vsla.payment.Transaction.dto.SuccessResponse;
 public class MeetingController {
     @Autowired
     private final MeetingService meetingService;
-    @GetMapping("/getAllMeetings")
-    List<MeetingDTO2> getAllMeetings() {
-        return meetingService.getAllMeetings();
+    @GetMapping("/getAllMeetings/Admin/{organizationId}")
+    List<MeetingDTO2> getAllMeetingsForAdmin(@PathVariable Long organizationId) {
+        return meetingService.getAllMeetings(organizationId);
     }
     @GetMapping("/getAllMeetings/{groupId}")
     List<MeetingDTO> getAllMeetings(@PathVariable Long groupId) {

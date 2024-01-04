@@ -16,7 +16,7 @@ public interface MeetingService {
 
     List<MeetingDTO> getAllMeetingsByGroup(Long groupId);
 
-    List<MeetingDTO2> getAllMeetings();
+    List<MeetingDTO2> getAllMeetings(Long organizationId);
 
     List<MeetingDTO> getActiveMeetingsByGroup(Long groupId);
 
