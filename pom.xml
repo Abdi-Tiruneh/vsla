@@ -72,6 +72,12 @@
             <artifactId>spring-boot-starter-mail</artifactId>
             <version>3.0.0</version>
         </dependency>
+         <!--service communication-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-openfeign</artifactId>
+            <version>4.0.4</version>
+        </dependency>
 
         <!--caching-->
 <!--        <dependency>-->

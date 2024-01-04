@@ -31,3 +31,6 @@ database:
 JWT_SECRET_KEY:
   AB(G+KbPeShVkYp3s6v9y$B&E)H@McQf
 
+# vsla base url
+VSLA_ADMIN:
+  BASE_URL: http://10.1.177.121:8112/api/v1/
