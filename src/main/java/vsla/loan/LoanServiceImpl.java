@@ -212,7 +212,7 @@ public class LoanServiceImpl implements LoanService {
     }
 
     @Override
-    public LoanPageDto getLoanPageDataForAdmin() {
+    public LoanPageDto getLoanPageDataForAdmin(Long organizationId) {
         pendingAmount = 0.0;
         activeAmount = 0.0;
         repaidAmount = 0.0;
@@ -221,8 +221,8 @@ public class LoanServiceImpl implements LoanService {
         List<Loan> loans = loanRepository.findAll();
         List<LoanListDto> loanListDtos = new ArrayList<LoanListDto>();
         loans.stream().forEach(l -> {
-            // if(l.getGroup().getOrganization().getOrganizationId().compareTo(user.getOrganization().getOrganizationId())==0)
-            // {
+            if(l.getGroup().getOrganization().getOrganizationId().compareTo(organizationId)==0)
+            {
                  LoanListDto loanListDto = new LoanListDto();
             loanListDto.setLoanId(l.getLoanId().toString());
             loanListDto.setAmount(l.getAmount().toString());
@@ -260,7 +260,7 @@ public class LoanServiceImpl implements LoanService {
                 lostAmount = +l.getAmount();
             }
             loanListDtos.add(loanListDto);
-            // }
+            }
         });
         LoanPageDto loanPageDto = new LoanPageDto();
         loanPageDto.setActiveValue(activeAmount.toString());

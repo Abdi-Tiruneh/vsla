@@ -28,10 +28,10 @@ public class LoanController {
         
         return loanService.getLoanPageData();
     }
-     @GetMapping("/AdminLoanPage")
-    LoanPageDto getLoanPageDataForAdmin() {
+     @GetMapping("/AdminLoanPage/{organizationId}")
+    LoanPageDto getLoanPageDataForAdmin(@PathVariable Long organizationId) {
         
-        return loanService.getLoanPageDataForAdmin();
+        return loanService.getLoanPageDataForAdmin(organizationId);
     }
 
     @PostMapping("/Add/{userId}")

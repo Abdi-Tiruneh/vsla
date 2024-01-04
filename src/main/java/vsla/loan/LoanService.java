@@ -7,7 +7,7 @@ import vsla.loan.dto.LoanPageDto;
 
 public interface LoanService {
     LoanPageDto getLoanPageData();
-    LoanPageDto getLoanPageDataForAdmin();
+    LoanPageDto getLoanPageDataForAdmin(Long organizationId);
     Loan addLoan(LoanAddRequestDto tempLoan, Long userId);
     Loan approveLoan(Long loanId);
     Loan repayLoan(Long loanId);
