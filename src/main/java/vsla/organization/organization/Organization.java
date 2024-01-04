@@ -19,7 +19,6 @@ import java.time.LocalDateTime;
 public class Organization {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "organization_id")
     private Long organizationId;
 

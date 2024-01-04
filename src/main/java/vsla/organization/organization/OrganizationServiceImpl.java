@@ -41,13 +41,13 @@ public class OrganizationServiceImpl implements OrganizationService {
 
     @Override
     public List<Organization> getAllOrganizations() {
+        
         return organizationRepository.findAll(Sort.by(Sort.Order.asc("organizationId")));
     }
 
     @Override
     public Organization getOrganizationById(Long organizationId) {
-        return organizationRepository.findById(organizationId)
-                .orElseThrow(() -> new ResourceNotFoundException("Project not found with ID: " + organizationId));
+        return organizationRepository.findOrganizationByOrganizationId(organizationId);
     }
 
     @Override

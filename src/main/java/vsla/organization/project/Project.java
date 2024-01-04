@@ -20,7 +20,6 @@ import java.time.LocalDateTime;
 public class Project {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "project_id")
     private Long projectId;
 

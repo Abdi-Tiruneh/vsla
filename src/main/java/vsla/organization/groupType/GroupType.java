@@ -20,7 +20,6 @@ import java.time.LocalDateTime;
 public class GroupType {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "group_type_id")
     private Long groupTypeId;
 

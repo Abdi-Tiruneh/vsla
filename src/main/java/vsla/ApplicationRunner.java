@@ -39,11 +39,11 @@ public class ApplicationRunner {
                 roles = roleRepository.saveAll(roles);
 
                 // Create and save organization
-                Organization organization = createOrganization();
-                organizationRepository.save(organization);
+                // Organization organization = createOrganization();
+                // organizationRepository.save(organization);
 
                 // Create and save user
-                Users johnDoe = createUser(roles.get(0), organization);
+                Users johnDoe = createUser(roles.get(0));
                 userRepository.save(johnDoe);
 
                 log.info("ApplicationRunner => Preloaded organization, roles and admin user");
@@ -62,7 +62,7 @@ public class ApplicationRunner {
         return List.of(groupAdmin, admin, user);
     }
 
-    private Users createUser(Role role, Organization organizationn) {
+    private Users createUser(Role role) {
         return Users.builder()
                 .password(passwordEncoder.encode("123456"))
                 .fullName("John Doe")
@@ -70,15 +70,15 @@ public class ApplicationRunner {
                 .username("0912345678")
                 .role(role)
                 .proxyEnabled(true)
-                .organization(organizationn)
+                .organization(null)
                 .userStatus(UserStatus.ACTIVE)
                 .build();
     }
 
-    private Organization createOrganization() {
-        Organization organization = new Organization();
-        organization.setOrganizationName("Ethio Care");
+    // private Organization createOrganization() {
+    //     Organization organization = new Organization();
+    //     organization.setOrganizationName("Ethio Care");
 
-        return organization;
-    }
+    //     return organization;
+    // }
 }
