@@ -14,4 +14,6 @@ public class MeetingDTO {
     private String intervalDays;
     private String meetingType;
     private String meetingReason;
+    private String meetingTypeId;
+    private String meetingIntervalId;
 }

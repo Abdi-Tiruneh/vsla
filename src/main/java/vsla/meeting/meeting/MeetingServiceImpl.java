@@ -3,7 +3,6 @@ package vsla.meeting.meeting;
 import lombok.RequiredArgsConstructor;
 import vsla.meeting.meeting.dto.MeetingDTO;
 import vsla.meeting.meeting.dto.MeetingDTO2;
-import vsla.userManager.user.Users;
 import vsla.utils.CurrentlyLoggedInUser;
 
 import org.springframework.stereotype.Service;
@@ -27,6 +26,8 @@ public class MeetingServiceImpl implements MeetingService {
         meetingToBeUpdated.setMeetingInterval(meeting.getMeetingInterval());
         meetingToBeUpdated.setMeetingReason(meeting.getMeetingReason());
         meetingToBeUpdated.setMeetingType(meeting.getMeetingType());
+        meetingToBeUpdated.setMeetingTypeId(meeting.getMeetingTypeId());
+        meetingToBeUpdated.setMeetingIntervalId(meeting.getMeetingIntervalId());
         meetingToBeUpdated.setIntervalDays(meeting.getIntervalDays());
         meetingToBeUpdated.setNextMeetingDate(meeting.getNextMeetingDate());
         meetingToBeUpdated.setCreatedAt(meetingToBeUpdated.getCreatedAt());
@@ -59,6 +60,8 @@ public class MeetingServiceImpl implements MeetingService {
             meetingDTO.setMeetingId(m.getMeetingId().toString());
             meetingDTO.setCurrentRound(String.valueOf(m.getCurrentRound()));
             meetingDTO.setIntervalDays(String.valueOf(m.getIntervalDays()));
+            meetingDTO.setMeetingIntervalId(m.getMeetingIntervalId().toString());
+            meetingDTO.setMeetingTypeId(m.getMeetingIntervalId().toString());
             meetingDTO.setMeetingInterval(m.getMeetingInterval());
             meetingDTO.setMeetingReason(m.getMeetingReason());
             meetingDTO.setNextMeetingDate(m.getNextMeetingDate().toString());
@@ -76,6 +79,8 @@ public class MeetingServiceImpl implements MeetingService {
             meetingDTO.setMeetingId(meeting.getMeetingId().toString());
             meetingDTO.setCurrentRound(String.valueOf(meeting.getCurrentRound()));
             meetingDTO.setIntervalDays(String.valueOf(meeting.getIntervalDays()));
+            meetingDTO.setMeetingIntervalId(meeting.getMeetingIntervalId().toString());
+            meetingDTO.setMeetingTypeId(meeting.getMeetingIntervalId().toString());
             meetingDTO.setMeetingInterval(meeting.getMeetingInterval());
             meetingDTO.setMeetingReason(meeting.getMeetingReason());
             meetingDTO.setNextMeetingDate(meeting.getNextMeetingDate().toString());
@@ -103,6 +108,8 @@ public class MeetingServiceImpl implements MeetingService {
             meetingDTO.setMeetingId(m.getMeetingId().toString());
             meetingDTO.setCurrentRound(String.valueOf(m.getCurrentRound()));
             meetingDTO.setIntervalDays(String.valueOf(m.getIntervalDays()));
+            meetingDTO.setMeetingIntervalId(m.getMeetingIntervalId().toString());
+            meetingDTO.setMeetingTypeId(m.getMeetingIntervalId().toString());
             meetingDTO.setMeetingInterval(m.getMeetingInterval());
             meetingDTO.setMeetingReason(m.getMeetingReason());
             meetingDTO.setNextMeetingDate(m.getNextMeetingDate().toString());
@@ -121,6 +128,8 @@ public class MeetingServiceImpl implements MeetingService {
             meetingDTO.setMeetingId(m.getMeetingId().toString());
             meetingDTO.setCurrentRound(String.valueOf(m.getCurrentRound()));
             meetingDTO.setIntervalDays(String.valueOf(m.getIntervalDays()));
+            meetingDTO.setMeetingIntervalId(m.getMeetingIntervalId().toString());
+            meetingDTO.setMeetingTypeId(m.getMeetingIntervalId().toString());
             meetingDTO.setMeetingInterval(m.getMeetingInterval());
             meetingDTO.setMeetingReason(m.getMeetingReason());
             meetingDTO.setNextMeetingDate(m.getNextMeetingDate().toString());

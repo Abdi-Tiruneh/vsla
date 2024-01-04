@@ -31,6 +31,12 @@ public class Meeting {
     @Column(name = "meeting_type")
     private String meetingType;
 
+    @Column(name = "meeting_type_id")
+    private Long meetingTypeId;
+
+    @Column(name = "meeting_interval_id")
+    private Long meetingIntervalId;
+
     @Column(name = "meeting_reseaon")
     private String meetingReason;
 
