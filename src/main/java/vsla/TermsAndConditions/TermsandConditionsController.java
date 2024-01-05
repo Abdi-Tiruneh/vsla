@@ -1,4 +1,4 @@
-package vsla.meeting.MeetingType;
+package vsla.TermsAndConditions;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,16 +9,19 @@ import lombok.RequiredArgsConstructor;
 import vsla.userManager.user.Users;
 import vsla.utils.CurrentlyLoggedInUser;
 
-@RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/v1/meeting-types")
-public class MeetingTypeController {
-    private final MeetingTypeFeignClient meetingTypeFeignClient;
-    private final CurrentlyLoggedInUser currentlyLoggedInUser;
+@RequiredArgsConstructor
+@RequestMapping("api/v1/TermsandConditions")
+public class TermsandConditionsController { 
 
-    @GetMapping("/getAll/App")
-    public ResponseEntity<?> getAllMeetingIntervals() {
+    private final CurrentlyLoggedInUser currentlyLoggedInUser;
+    private final TermsandConditionsFeignClient termsandConditionsFeignClient;
+
+    @GetMapping("/getTermsandConditions/App")
+    public ResponseEntity<?> getAllTermsAndConditions() {
         Users loggedInUser = currentlyLoggedInUser.getUser();
-        return meetingTypeFeignClient.getAllMeetingTypes(loggedInUser.getOrganization().getOrganizationId());
-    }
+      return termsandConditionsFeignClient.getAllTermsAndConditions(loggedInUser.getOrganization().getOrganizationId());
+
+    
+}
 }
