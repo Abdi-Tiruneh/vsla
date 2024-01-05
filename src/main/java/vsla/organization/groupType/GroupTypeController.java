@@ -13,7 +13,9 @@ import org.springframework.web.bind.annotation.*;
 import vsla.organization.groupType.dto.GroupTypeReq;
 import vsla.organization.organization.Organization;
 import vsla.organization.organization.OrganizationService;
+import vsla.userManager.user.Users;
 import vsla.utils.ApiResponse;
+import vsla.utils.CurrentlyLoggedInUser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +28,7 @@ public class GroupTypeController {
     private final GroupTypeFeignClient groupTypeFeignClient;
     private final OrganizationService organizationService;
     private final GroupTypeRepository groupTypeRepository;
+    private final CurrentlyLoggedInUser currentlyLoggedInUser;
      @Autowired
     private EntityManager entityManager;
     @PostMapping
@@ -40,10 +43,10 @@ public class GroupTypeController {
         return ResponseEntity.ok(groupTypeService.updateGroupType(groupTypeId, updateReq));
     }
     @Transactional
-    @GetMapping("/by-organization/{organizationId}")
-    public ResponseEntity<List<GroupType>> getAllGroupTypes(@PathVariable Long organizationId) {
-        Organization organization=organizationService.getOrganizationById(organizationId);
-        List<GroupType> groupTypes=groupTypeFeignClient.getAllGroupTypeByOrganization(organizationId);
+    @GetMapping("/by-organization")
+    public ResponseEntity<List<GroupType>> getAllGroupTypes() {
+         Users loggedInUser=currentlyLoggedInUser.getUser();
+        List<GroupType> groupTypes=groupTypeFeignClient.getAllGroupTypeByOrganization(loggedInUser.getOrganization().getOrganizationId());
         List<GroupType> updatedGroupTypes=new ArrayList<GroupType>();
         groupTypes.stream().forEach(g->{
             GroupType groupType= new GroupType();
@@ -51,7 +54,7 @@ public class GroupTypeController {
             groupType.setDeleted(false);
             groupType.setGroupTypeId(g.getGroupTypeId());
             groupType.setGroupTypeName(g.getGroupTypeName());
-            groupType.setOrganization(organization);
+            groupType.setOrganization(loggedInUser.getOrganization());
             groupType.setStatus(g.getStatus());
             groupType.setUpdatedAt(g.getUpdatedAt());
             updatedGroupTypes.add(groupType);
@@ -60,7 +63,7 @@ public class GroupTypeController {
         updatedGroupTypes.stream().forEach(ug->{
             groupTypeRepository.save(ug);
         });
-        return ResponseEntity.ok(groupTypeService.getAllGroupTypesByOrganization(organizationId));
+        return ResponseEntity.ok(groupTypeService.getAllGroupTypesByOrganization(loggedInUser.getOrganization().getOrganizationId()));
     }
 
     @DeleteMapping({"/{groupTypeId}"})

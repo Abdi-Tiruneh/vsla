@@ -14,7 +14,9 @@ import org.springframework.web.bind.annotation.*;
 import vsla.organization.organization.Organization;
 import vsla.organization.organization.OrganizationService;
 import vsla.organization.project.dto.ProjectReq;
+import vsla.userManager.user.Users;
 import vsla.utils.ApiResponse;
+import vsla.utils.CurrentlyLoggedInUser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,8 +27,8 @@ import java.util.List;
 public class ProjectController {
     private final ProjectService projectService;
     private final ProjectFeignClient projectFeignClient;
-    private final OrganizationService organizationService;
     private final ProjectRepository projectRepository;
+    private final CurrentlyLoggedInUser currentlyLoggedInUser;
     @Autowired
     private EntityManager entityManager;
     
@@ -44,17 +46,17 @@ public class ProjectController {
         return ResponseEntity.ok(projectService.updateProject(projectId, updateReq));
     }
     @Transactional
-    @GetMapping("/by-organization/{organizationId}")
-    public ResponseEntity<List<Project>> getAllProjects(@PathVariable Long organizationId) {
-        Organization organization=organizationService.getOrganizationById(organizationId);
-        List<Project> projects=projectFeignClient.getAllProjectsByOrganization(organizationId);
+    @GetMapping("/by-organization")
+    public ResponseEntity<List<Project>> getAllProjects() {
+        Users loggedInUser=currentlyLoggedInUser.getUser();
+        List<Project> projects=projectFeignClient.getAllProjectsByOrganization(loggedInUser.getOrganization().getOrganizationId());
         List<Project> updatedProjects=new ArrayList<Project>();
         projects.stream().forEach(p->{
             Project project= new Project();
             project.setProjectId(p.getProjectId());
             project.setProjectName(p.getProjectName());
             project.setCreatedAt(p.getCreatedAt());
-            project.setOrganization(organization);
+            project.setOrganization(loggedInUser.getOrganization());
             project.setDeleted(false);
             project.setStatus(p.getStatus());
             project.setUpdatedAt(p.getUpdatedAt());
@@ -64,7 +66,7 @@ public class ProjectController {
         updatedProjects.stream().forEach(up->{
             projectRepository.save(up);
         });
-        return ResponseEntity.ok(projectService.getAllProjectsByOrganization(organizationId));
+        return ResponseEntity.ok(projectService.getAllProjectsByOrganization(loggedInUser.getOrganization().getOrganizationId()));
     }
 
     @DeleteMapping({"/{projectId}"})
