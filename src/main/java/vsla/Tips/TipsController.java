@@ -1,4 +1,4 @@
-package vsla.meeting.MeetingType;
+package vsla.Tips;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,14 +11,14 @@ import vsla.utils.CurrentlyLoggedInUser;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/v1/meeting-types")
-public class MeetingTypeController {
-    private final MeetingTypeFeignClient meetingTypeFeignClient;
+@RequestMapping("/api/v1/Tips")
+public class TipsController {
+    private final TipsFeignClient tipsFeignClient;
     private final CurrentlyLoggedInUser currentlyLoggedInUser;
 
-    @GetMapping("/getAll/App")
-    public ResponseEntity<?> getAllMeetingIntervals() {
+    @GetMapping("/getTips/App")
+    public ResponseEntity<?> getAllTips() {
         Users loggedInUser = currentlyLoggedInUser.getUser();
-        return meetingTypeFeignClient.getAllMeetingTypes(loggedInUser.getOrganization().getOrganizationId());
+        return tipsFeignClient.getAllTips(loggedInUser.getOrganization().getOrganizationId());
     }
 }
