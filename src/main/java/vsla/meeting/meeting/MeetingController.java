@@ -56,7 +56,7 @@ public class MeetingController {
     @PutMapping("/editMeeting/{meetingId}")
     public ResponseEntity<SuccessResponse> editMeeeting(@PathVariable Long meetingId, @RequestBody	Meeting meeting) {
         
-        meetingService.EditMeeting(null, meeting);
+        meetingService.EditMeeting(meetingId, meeting);
          SuccessResponse response = new SuccessResponse("meeting edited successfully","success");
             return new ResponseEntity<SuccessResponse>(response, HttpStatus.OK);
     }
