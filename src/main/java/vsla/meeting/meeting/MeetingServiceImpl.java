@@ -29,6 +29,7 @@ public class MeetingServiceImpl implements MeetingService {
         meetingToBeUpdated.setMeetingTypeId(meeting.getMeetingTypeId());
         meetingToBeUpdated.setMeetingIntervalId(meeting.getMeetingIntervalId());
         meetingToBeUpdated.setIntervalDays(meeting.getIntervalDays());
+        meetingToBeUpdated.setIsEnabled(meeting.getIsEnabled());
         meetingToBeUpdated.setNextMeetingDate(meeting.getNextMeetingDate());
         meetingToBeUpdated.setCreatedAt(meetingToBeUpdated.getCreatedAt());
         meetingToBeUpdated.setUpdatedAt(localDateTime);
@@ -61,7 +62,7 @@ public class MeetingServiceImpl implements MeetingService {
             meetingDTO.setCurrentRound(String.valueOf(m.getCurrentRound()));
             meetingDTO.setIntervalDays(String.valueOf(m.getIntervalDays()));
             meetingDTO.setMeetingIntervalId(m.getMeetingIntervalId().toString());
-            meetingDTO.setMeetingTypeId(m.getMeetingIntervalId().toString());
+            meetingDTO.setMeetingTypeId(m.getMeetingTypeId().toString());
             meetingDTO.setMeetingInterval(m.getMeetingInterval());
             meetingDTO.setMeetingReason(m.getMeetingReason());
             meetingDTO.setNextMeetingDate(m.getNextMeetingDate().toString());
